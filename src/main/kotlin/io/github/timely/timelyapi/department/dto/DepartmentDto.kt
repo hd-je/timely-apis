@@ -1,0 +1,39 @@
+package io.github.timely.timelyapi.department.dto
+
+import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDateTime
+
+class DepartmentDto {
+    @Schema(description = "부서 상세 응답")
+    data class Response(
+        @field:Schema(description = "부서 일련번호", example = "1")
+        val deptSn: Long,
+
+        @field:Schema(description = "소속 회사 일련번호", example = "1")
+        val companySn: Long?,
+
+        @field:Schema(description = "부서명", example = "개발팀")
+        val deptNm: String,
+
+        @field:Schema(description = "사용 여부. Y: 사용, N: 미사용", example = "Y")
+        val useYn: String,
+
+        @field:Schema(description = "생성일시", example = "2026-05-04T16:00:00")
+        val createDt: LocalDateTime?,
+
+        @field:Schema(description = "수정일시", example = "2026-05-04T16:30:00")
+        val updateDt: LocalDateTime?
+    )
+
+    @Schema(description = "부서 목록 응답")
+    data class SimpleResponse(
+        @field:Schema(description = "부서 일련번호", example = "1")
+        val deptSn: Long,
+
+        @field:Schema(description = "소속 회사 일련번호", example = "1")
+        val companySn: Long?,
+
+        @field:Schema(description = "부서명", example = "개발팀")
+        val deptNm: String
+    )
+}
