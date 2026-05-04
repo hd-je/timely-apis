@@ -20,9 +20,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                withCredentials([string(credentialsId: 'timely-db-password', variable: 'DB_PASSWORD')]) {
+                withCredentials([string(credentialsId: 'timely-db-password', variable: 'TIMELY_DB_PASSWORD')]) {
                     sh 'chmod +x scripts/deploy.sh'
-                    sh './scripts/deploy.sh'
+                    sh 'DB_PASSWORD="$TIMELY_DB_PASSWORD" ./scripts/deploy.sh'
                 }
             }
         }
