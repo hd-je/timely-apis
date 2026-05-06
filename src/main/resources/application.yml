@@ -13,6 +13,9 @@ spring:
   application:
     name: timely
 
+server:
+  forward-headers-strategy: framework
+
 logging:
   level:
     org.hibernate.SQL: info

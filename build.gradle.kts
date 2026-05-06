@@ -33,6 +33,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.security:spring-security-crypto")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17")
+    implementation("org.yaml:snakeyaml")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
