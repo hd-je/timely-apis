@@ -65,7 +65,7 @@ class DepartmentController(
         departmentService.updateDepartment(deptSn, request)
 
     @Operation(summary = "Update department use flag")
-    @PatchMapping("/{deptSn}/use-yn")
+    @PatchMapping("/{deptSn}")
     fun updateDepartmentUseYn(
         @Parameter(description = "Department serial number", example = "1")
         @PathVariable

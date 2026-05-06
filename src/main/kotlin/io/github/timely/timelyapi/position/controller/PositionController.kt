@@ -69,7 +69,7 @@ class PositionController(
         positionService.updatePosition(positionSn, request)
 
     @Operation(summary = "Update position use flag")
-    @PatchMapping("/{positionSn}/use-yn")
+    @PatchMapping("/{positionSn}")
     fun updatePositionUseYn(
         @Parameter(description = "Position serial number", example = "1")
         @PathVariable
