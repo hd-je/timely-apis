@@ -6,7 +6,7 @@ import io.github.timely.timelyapi.department.repository.DepartmentRepository
 import io.github.timely.timelyapi.position.repository.PositionRepository
 import io.github.timely.timelyapi.user.model.TimelyUser
 import io.github.timely.timelyapi.user.repository.UserRepository
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +16,7 @@ class AuthService(
     private val companyRepository: CompanyRepository,
     private val departmentRepository: DepartmentRepository,
     private val positionRepository: PositionRepository,
-    private val passwordEncoder: BCryptPasswordEncoder
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     @Transactional
