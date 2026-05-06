@@ -1,4 +1,4 @@
-package io.github.timely.timelyapi.user.model
+package io.github.timely.timelyapi.position.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -9,12 +9,12 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "tb_user")
-class TimelyUser(
+@Table(name = "tb_position")
+class Position(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_SN")
-    val userSn: Long? = null,
+    @Column(name = "POSITION_SN")
+    val positionSn: Long? = null,
 
     @Column(name = "CREATE_DT", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
@@ -25,29 +25,14 @@ class TimelyUser(
     @Column(name = "COMPANY_SN", nullable = false)
     var companySn: Long,
 
-    @Column(name = "DEPT_SN", nullable = false)
-    var deptSn: Long,
-
-    @Column(name = "EMAIL", nullable = false)
-    var email: String,
-
-    @Column(name = "PASSWORD", nullable = false)
-    var passwordHash: String,
-
-    @Column(name = "USER_NM", nullable = false, length = 100)
-    var userNm: String,
-
     @Column(name = "POSITION_CD", nullable = false, length = 50)
-    var position: String,
+    var positionCd: String,
 
-    @Column(name = "PHONE_NO", nullable = false, length = 30)
-    var phoneNo: String,
+    @Column(name = "POSITION_NM", nullable = false, length = 100)
+    var positionNm: String,
 
-    @Column(name = "AVATAR_URL", length = 500)
-    var avatarUrl: String? = null,
-
-    @Column(name = "USER_STATUS", nullable = false, length = 30)
-    var userStatus: String,
+    @Column(name = "SORT_ORD", nullable = false)
+    var sortOrd: Int = 0,
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "char(1)")
     var useYn: String

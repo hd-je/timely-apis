@@ -35,10 +35,11 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
-    fun checkLoginId(loginId: String): UserDto.LoginIdExistsResponse {
-        return UserDto.LoginIdExistsResponse(
-            loginId = loginId,
-            exists = userRepository.existsByLoginId(loginId)
+    fun checkEmail(email: String): UserDto.EmailExistsResponse {
+        val normalizedEmail = email.trim()
+        return UserDto.EmailExistsResponse(
+            email = normalizedEmail,
+            exists = userRepository.existsByEmailIgnoreCase(normalizedEmail)
         )
     }
 
@@ -47,9 +48,9 @@ class UserService(
             userSn = userSn!!,
             companySn = companySn,
             deptSn = deptSn,
-            loginId = loginId,
             userNm = userNm,
             position = position,
+            email = email,
             avatarUrl = avatarUrl,
             userStatus = userStatus
         )
@@ -59,7 +60,6 @@ class UserService(
             userSn = userSn!!,
             companySn = companySn,
             deptSn = deptSn,
-            loginId = loginId,
             userNm = userNm,
             position = position,
             phoneNo = phoneNo,

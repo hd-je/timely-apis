@@ -10,46 +10,46 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "User", description = "사용자 API")
+@Tag(name = "User", description = "User API")
 @RestController
 @RequestMapping("/v1/users")
 class UserController(
     private val userService: UserService
 ) {
 
-    @Operation(summary = "사용자 목록 검색")
+    @Operation(summary = "Search users")
     @GetMapping
     fun searchUsers(
-        @Parameter(description = "회사 일련번호. 입력하면 해당 회사 사용자만 조회", example = "1")
+        @Parameter(description = "Company serial number", example = "1")
         @RequestParam(required = false)
         companySn: Long?,
 
-        @Parameter(description = "부서 일련번호. 입력하면 해당 부서 사용자만 조회", example = "2")
+        @Parameter(description = "Department serial number", example = "2")
         @RequestParam(required = false)
         deptSn: Long?,
 
-        @Parameter(description = "사용자 상태. ACTIVE, PENDING, LOCKED, WITHDRAWN", example = "ACTIVE")
+        @Parameter(description = "User status", example = "ACTIVE")
         @RequestParam(required = false)
         userStatus: String?,
 
-        @Parameter(description = "로그인 아이디, 사용자명, 이메일 검색어", example = "김민수")
+        @Parameter(description = "User name or email keyword", example = "김민수")
         @RequestParam(required = false)
         keyword: String?
     ) = userService.searchUsers(companySn, deptSn, userStatus, keyword)
 
-    @Operation(summary = "로그인 아이디 중복 확인")
-    @GetMapping("/login-id/exists")
-    fun checkLoginId(
-        @Parameter(description = "중복 확인할 로그인 아이디", example = "kimminsu")
+    @Operation(summary = "Check email duplication")
+    @GetMapping("/email/exists")
+    fun checkEmail(
+        @Parameter(description = "Email to check", example = "kimminsu@example.com")
         @RequestParam
-        loginId: String
+        email: String
     ) =
-        userService.checkLoginId(loginId)
+        userService.checkEmail(email)
 
-    @Operation(summary = "사용자 상세 조회")
+    @Operation(summary = "Get user")
     @GetMapping("/{userSn}")
     fun getUser(
-        @Parameter(description = "사용자 일련번호", example = "1")
+        @Parameter(description = "User serial number", example = "1")
         @PathVariable
         userSn: Long
     ) =

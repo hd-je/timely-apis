@@ -3,51 +3,72 @@ package io.github.timely.timelyapi.auth.dto
 import io.swagger.v3.oas.annotations.media.Schema
 
 class AuthDto {
-    @Schema(description = "회원가입 요청")
+    @Schema(description = "Signup request")
     data class SignupRequest(
-        @field:Schema(description = "회사 일련번호", example = "1")
+        @field:Schema(description = "Company serial number", example = "1")
         val companySn: Long,
 
-        @field:Schema(description = "부서 일련번호", example = "2")
+        @field:Schema(description = "Department serial number", example = "2")
         val deptSn: Long,
 
-        @field:Schema(description = "직급 코드", example = "MANAGER")
+        @field:Schema(description = "Position code", example = "LEAD")
         val position: String,
 
-        @field:Schema(description = "실명", example = "김민수")
+        @field:Schema(description = "Name", example = "김민수")
         val name: String,
 
-        @field:Schema(description = "로그인 아이디. 영문/숫자 6자 이상", example = "kimminsu")
-        val loginId: String,
-
-        @field:Schema(description = "비밀번호. 영문/숫자/특수문자 포함 8자 이상", example = "Password!123")
+        @field:Schema(description = "Password. At least 8 characters including letters, numbers, and special characters", example = "Password!123")
         val password: String,
 
-        @field:Schema(description = "비밀번호 확인", example = "Password!123")
+        @field:Schema(description = "Password confirmation", example = "Password!123")
         val passwordConfirm: String,
 
-        @field:Schema(description = "전화번호", example = "010-1111-2222")
+        @field:Schema(description = "Phone number", example = "010-1111-2222")
         val phoneNo: String,
 
-        @field:Schema(description = "이메일", example = "kimminsu@example.com")
-        val email: String? = null,
+        @field:Schema(description = "Email used as login ID", example = "kimminsu@example.com")
+        val email: String,
 
-        @field:Schema(description = "프로필 이미지 URL", example = "https://example.com/avatar/1.png")
+        @field:Schema(description = "Profile image URL", example = "https://example.com/avatar/1.png")
         val avatarUrl: String? = null
     )
 
-    @Schema(description = "회원가입 응답")
+    @Schema(description = "Signup response")
     data class SignupResponse(
-        @field:Schema(description = "생성된 사용자 일련번호", example = "1")
+        @field:Schema(description = "Created user serial number", example = "1")
         val userSn: Long,
 
-        @field:Schema(description = "로그인 아이디", example = "kimminsu")
-        val loginId: String,
+        @field:Schema(description = "Email used as login ID", example = "kimminsu@example.com")
+        val email: String,
 
-        @field:Schema(description = "사용자명", example = "김민수")
+        @field:Schema(description = "User name", example = "김민수")
         val userNm: String,
 
-        @field:Schema(description = "사용자 상태", example = "ACTIVE")
+        @field:Schema(description = "User status", example = "ACTIVE")
+        val userStatus: String
+    )
+
+    @Schema(description = "Login request")
+    data class LoginRequest(
+        @field:Schema(description = "Email", example = "kimminsu@example.com")
+        val email: String,
+
+        @field:Schema(description = "Password", example = "Password!123")
+        val password: String
+    )
+
+    @Schema(description = "Login response")
+    data class LoginResponse(
+        @field:Schema(description = "User serial number", example = "1")
+        val userSn: Long,
+
+        @field:Schema(description = "Email", example = "kimminsu@example.com")
+        val email: String,
+
+        @field:Schema(description = "User name", example = "김민수")
+        val userNm: String,
+
+        @field:Schema(description = "User status", example = "ACTIVE")
         val userStatus: String
     )
 }

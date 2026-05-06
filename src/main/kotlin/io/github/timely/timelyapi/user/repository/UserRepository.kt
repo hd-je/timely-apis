@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : JpaRepository<TimelyUser, Long> {
 
-    fun existsByLoginId(loginId: String): Boolean
+    fun existsByEmailIgnoreCase(email: String): Boolean
+
+    fun findByEmailIgnoreCaseAndUseYn(email: String, useYn: String): TimelyUser?
 
     @Query(
         """
@@ -21,7 +23,6 @@ interface UserRepository : JpaRepository<TimelyUser, Long> {
           and (:userStatus is null or u.userStatus = :userStatus)
           and (
               :keyword is null
-              or lower(u.loginId) like lower(concat('%', :keyword, '%'))
               or lower(u.userNm) like lower(concat('%', :keyword, '%'))
               or lower(u.email) like lower(concat('%', :keyword, '%'))
           )
