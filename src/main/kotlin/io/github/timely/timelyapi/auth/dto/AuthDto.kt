@@ -71,6 +71,9 @@ class AuthDto {
         @field:Schema(description = "User serial number", example = "1")
         val userSn: Long,
 
+        @field:Schema(description = "Company serial number", example = "1")
+        val companySn: Long,
+
         @field:Schema(description = "Email", example = "kimminsu@example.com")
         val email: String,
 
@@ -85,6 +88,9 @@ class AuthDto {
     data class MeResponse(
         @field:Schema(description = "User serial number", example = "1")
         val userSn: Long,
+
+        @field:Schema(description = "Company serial number", example = "1")
+        val companySn: Long,
 
         @field:Schema(description = "Email", example = "kimminsu@example.com")
         val email: String,

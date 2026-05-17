@@ -20,6 +20,7 @@ class JwtTokenProvider(
 
         return Jwts.builder()
             .subject(user.userSn!!.toString())
+            .claim("companySn", user.companySn)
             .claim("email", user.email)
             .claim("userNm", user.userNm)
             .claim("userStatus", user.userStatus)
@@ -33,6 +34,7 @@ class JwtTokenProvider(
         val claims = parseClaims(token)
         return TimelyPrincipal(
             userSn = claims.subject.toLong(),
+            companySn = claims["companySn", Number::class.java].toLong(),
             email = claims["email", String::class.java],
             userNm = claims["userNm", String::class.java],
             userStatus = claims["userStatus", String::class.java]

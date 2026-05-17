@@ -13,42 +13,42 @@ import java.time.LocalDateTime
 class TimelyUser(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_SN")
+    @Column(name = "user_sn")
     val userSn: Long? = null,
 
-    @Column(name = "CREATE_DT", insertable = false, updatable = false)
+    @Column(name = "create_dt", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
 
-    @Column(name = "UPDATE_DT", insertable = false, updatable = false)
+    @Column(name = "update_dt", insertable = false, updatable = false)
     var updateDt: LocalDateTime? = null,
 
-    @Column(name = "COMPANY_SN", nullable = false)
+    @Column(name = "company_sn", nullable = false)
     var companySn: Long,
 
-    @Column(name = "DEPT_SN", nullable = false)
+    @Column(name = "dept_sn", nullable = false)
     var deptSn: Long,
 
-    @Column(name = "EMAIL", nullable = false)
+    @Column(name = "email", nullable = false)
     var email: String,
 
-    @Column(name = "PASSWORD", nullable = false)
+    @Column(name = "password", nullable = false)
     var passwordHash: String,
 
-    @Column(name = "USER_NM", nullable = false, length = 100)
+    @Column(name = "user_nm", nullable = false, length = 100)
     var userNm: String,
 
-    @Column(name = "POSITION_CD", nullable = false, length = 50)
+    @Column(name = "position_cd", nullable = false, length = 50)
     var position: String,
 
-    @Column(name = "PHONE_NO", nullable = false, length = 30)
+    @Column(name = "phone_no", nullable = false, length = 30)
     var phoneNo: String,
 
-    @Column(name = "AVATAR_URL", length = 500)
+    @Column(name = "avatar_url", length = 500)
     var avatarUrl: String? = null,
 
-    @Column(name = "USER_STATUS", nullable = false, length = 30)
+    @Column(name = "user_status", nullable = false, length = 30)
     var userStatus: String,
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "char(1)")
+    @Column(name = "use_yn", nullable = false, columnDefinition = "char(1)")
     var useYn: String
 )

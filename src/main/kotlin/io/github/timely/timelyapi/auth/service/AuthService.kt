@@ -104,6 +104,7 @@ class AuthService(
             accessToken = jwtTokenProvider.createAccessToken(user),
             expiresIn = jwtProperties.accessTokenExpirationMs / 1000,
             userSn = user.userSn!!,
+            companySn = user.companySn,
             email = user.email,
             userNm = user.userNm,
             userStatus = user.userStatus
@@ -113,6 +114,7 @@ class AuthService(
     fun me(principal: TimelyPrincipal): AuthDto.MeResponse {
         return AuthDto.MeResponse(
             userSn = principal.userSn,
+            companySn = principal.companySn,
             email = principal.email,
             userNm = principal.userNm,
             userStatus = principal.userStatus

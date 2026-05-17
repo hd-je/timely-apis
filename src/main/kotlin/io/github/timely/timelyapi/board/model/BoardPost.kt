@@ -13,33 +13,36 @@ import java.time.LocalDateTime
 class BoardPost(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BOARD_POST_SN")
+    @Column(name = "board_post_sn")
     val boardPostSn: Long? = null,
 
-    @Column(name = "CREATE_DT", insertable = false, updatable = false)
+    @Column(name = "create_dt", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
 
-    @Column(name = "UPDATE_DT", insertable = false, updatable = false)
+    @Column(name = "update_dt", insertable = false, updatable = false)
     var updateDt: LocalDateTime? = null,
 
-    @Column(name = "AUTHOR_USER_SN", nullable = false)
+    @Column(name = "author_user_sn", nullable = false)
     var authorUserSn: Long,
 
-    @Column(name = "CATEGORY", nullable = false, length = 30)
+    @Column(name = "company_sn", nullable = false)
+    var companySn: Long,
+
+    @Column(name = "category", nullable = false, length = 30)
     var category: String,
 
-    @Column(name = "STATUS", nullable = false, length = 30)
+    @Column(name = "status", nullable = false, length = 30)
     var status: String,
 
-    @Column(name = "TITLE", nullable = false, length = 200)
+    @Column(name = "title", nullable = false, length = 200)
     var title: String,
 
-    @Column(name = "CONTENT", nullable = false, columnDefinition = "text")
+    @Column(name = "content", nullable = false, columnDefinition = "text")
     var content: String,
 
-    @Column(name = "VIEW_CNT", nullable = false)
+    @Column(name = "view_cnt", nullable = false)
     var viewCnt: Long = 0,
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "char(1)")
+    @Column(name = "use_yn", nullable = false, columnDefinition = "char(1)")
     var useYn: String = "Y"
 )

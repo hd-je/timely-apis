@@ -13,18 +13,18 @@ import java.time.LocalDateTime
 class Company(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "COMPANY_SN")
+    @Column(name = "company_sn")
     val companySn: Long? = null,
 
-    @Column(name = "CREATE_DT", insertable = false, updatable = false)
+    @Column(name = "create_dt", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
 
-    @Column(name = "UPDATE_DT", insertable = false, updatable = false)
+    @Column(name = "update_dt", insertable = false, updatable = false)
     var updateDt: LocalDateTime? = null,
 
-    @Column(name = "COMPANY_NM", nullable = false, length = 200)
+    @Column(name = "company_nm", nullable = false, length = 200)
     var companyNm: String,
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "char(1)")
+    @Column(name = "use_yn", nullable = false, columnDefinition = "char(1)")
     var useYn: String
 )
