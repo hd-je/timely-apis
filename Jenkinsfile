@@ -20,9 +20,17 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                withCredentials([string(credentialsId: 'timely-db-password', variable: 'TIMELY_DB_PASSWORD')]) {
+                withCredentials([
+                    string(credentialsId: 'timely-db-password', variable: 'TIMELY_DB_PASSWORD'),
+                    string(credentialsId: 'timely-jwt-secret', variable: 'TIMELY_JWT_SECRET')
+                ]) {
                     sh 'chmod +x scripts/deploy.sh'
-                    sh 'DB_PASSWORD="$TIMELY_DB_PASSWORD" ./scripts/deploy.sh'
+                    sh '''
+                      DB_PASSWORD="$TIMELY_DB_PASSWORD" \
+                      JWT_SECRET="$TIMELY_JWT_SECRET" \
+                      JWT_ACCESS_TOKEN_EXPIRATION_MS="3600000" \
+                      ./scripts/deploy.sh
+                    '''
                 }
             }
         }

@@ -11,6 +11,8 @@ CONTAINER_PORT="${CONTAINER_PORT:-8080}"
 DB_URL="${DB_URL:-jdbc:mysql://mysql:3306/devdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true}"
 DB_USER="${DB_USER:-dev}"
 DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD environment variable is required}"
+JWT_SECRET="${JWT_SECRET:?JWT_SECRET environment variable is required}"
+JWT_ACCESS_TOKEN_EXPIRATION_MS="${JWT_ACCESS_TOKEN_EXPIRATION_MS:-3600000}"
 
 if [ -z "${NETWORK_NAME}" ]; then
   if docker network inspect ci >/dev/null 2>&1; then
@@ -41,6 +43,8 @@ docker run -d \
   -e DB_URL="${DB_URL}" \
   -e DB_USER="${DB_USER}" \
   -e DB_PASSWORD="${DB_PASSWORD}" \
+  -e JWT_SECRET="${JWT_SECRET}" \
+  -e JWT_ACCESS_TOKEN_EXPIRATION_MS="${JWT_ACCESS_TOKEN_EXPIRATION_MS}" \
   "${IMAGE_NAME}"
 
 echo "[deploy] Waiting for application startup"
