@@ -11,13 +11,14 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BoardPostRepository : JpaRepository<BoardPost, Long> {
 
-    fun findByBoardPostSnAndUseYn(boardPostSn: Long, useYn: String): BoardPost?
+    fun findByBoardPostSnAndCompanySnAndUseYn(boardPostSn: Long, companySn: Long, useYn: String): BoardPost?
 
     @Query(
         """
         select p
         from BoardPost p
         where p.useYn = 'Y'
+          and p.companySn = :companySn
           and (:category is null or p.category = :category)
           and (:status is null or p.status = :status)
           and (
@@ -28,6 +29,7 @@ interface BoardPostRepository : JpaRepository<BoardPost, Long> {
         """
     )
     fun searchActivePosts(
+        @Param("companySn") companySn: Long,
         @Param("category") category: String?,
         @Param("status") status: String?,
         @Param("keyword") keyword: String?,

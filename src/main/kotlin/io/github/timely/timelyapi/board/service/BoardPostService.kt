@@ -20,12 +20,13 @@ class BoardPostService(
 ) {
 
     @Transactional
-    fun createPost(authorUserSn: Long, request: BoardPostDto.CreateRequest): BoardPostDto.Response {
+    fun createPost(authorUserSn: Long, companySn: Long, request: BoardPostDto.CreateRequest): BoardPostDto.Response {
         validatePostValues(request.category, request.status, request.title, request.content)
 
         return boardPostRepository.save(
             BoardPost(
                 authorUserSn = authorUserSn,
+                companySn = companySn,
                 category = request.category.trim(),
                 status = request.status.trim(),
                 title = request.title.trim(),
@@ -36,12 +37,14 @@ class BoardPostService(
 
     @Transactional(readOnly = true)
     fun searchPosts(
+        companySn: Long,
         category: String?,
         status: String?,
         keyword: String?,
         pageable: Pageable
     ): PageResponse<BoardPostDto.SimpleResponse> {
         val page = boardPostRepository.searchActivePosts(
+            companySn = companySn,
             category = category.normalized(),
             status = status.normalized(),
             keyword = keyword.normalized(),
@@ -52,17 +55,17 @@ class BoardPostService(
     }
 
     @Transactional
-    fun getPost(boardPostSn: Long): BoardPostDto.Response {
-        val post = getActivePost(boardPostSn)
+    fun getPost(companySn: Long, boardPostSn: Long): BoardPostDto.Response {
+        val post = getActivePost(companySn, boardPostSn)
         post.viewCnt += 1
         return post.toResponse()
     }
 
     @Transactional
-    fun updatePost(boardPostSn: Long, request: BoardPostDto.UpdateRequest): BoardPostDto.Response {
+    fun updatePost(companySn: Long, boardPostSn: Long, request: BoardPostDto.UpdateRequest): BoardPostDto.Response {
         validatePostValues(request.category, request.status, request.title, request.content)
 
-        val post = getActivePost(boardPostSn)
+        val post = getActivePost(companySn, boardPostSn)
         post.category = request.category.trim()
         post.status = request.status.trim()
         post.title = request.title.trim()
@@ -72,13 +75,13 @@ class BoardPostService(
     }
 
     @Transactional
-    fun deletePost(boardPostSn: Long) {
-        val post = getActivePost(boardPostSn)
+    fun deletePost(companySn: Long, boardPostSn: Long) {
+        val post = getActivePost(companySn, boardPostSn)
         post.useYn = "N"
     }
 
-    internal fun getActivePost(boardPostSn: Long): BoardPost {
-        return boardPostRepository.findByBoardPostSnAndUseYn(boardPostSn, "Y")
+    internal fun getActivePost(companySn: Long, boardPostSn: Long): BoardPost {
+        return boardPostRepository.findByBoardPostSnAndCompanySnAndUseYn(boardPostSn, companySn, "Y")
             ?: throw IllegalArgumentException("Board post not found")
     }
 

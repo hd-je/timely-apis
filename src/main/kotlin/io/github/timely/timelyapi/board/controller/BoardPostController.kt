@@ -3,13 +3,12 @@ package io.github.timely.timelyapi.board.controller
 import io.github.timely.timelyapi.board.dto.BoardPostDto
 import io.github.timely.timelyapi.board.service.BoardPostService
 import io.github.timely.timelyapi.auth.jwt.TimelyPrincipal
+import io.github.timely.timelyapi.common.PageableFactory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.data.domain.Pageable
-import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -42,7 +41,7 @@ class BoardPostController(
     fun createPost(
         @AuthenticationPrincipal principal: TimelyPrincipal,
         @RequestBody request: BoardPostDto.CreateRequest
-    ) = boardPostService.createPost(principal.userSn, request)
+    ) = boardPostService.createPost(principal.userSn, principal.companySn, request)
 
     @Operation(summary = "게시글 목록 검색", description = "카테고리, 상태, 키워드 조건으로 게시글을 페이징 조회한다.")
     @ApiResponses(
@@ -52,6 +51,7 @@ class BoardPostController(
     )
     @GetMapping
     fun searchPosts(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
         @Parameter(description = "카테고리 코드", example = "NOTICE")
         @RequestParam(required = false)
         category: String?,
@@ -64,9 +64,30 @@ class BoardPostController(
         @RequestParam(required = false)
         keyword: String?,
 
-        @PageableDefault(size = 20, sort = ["boardPostSn"])
-        pageable: Pageable
-    ) = boardPostService.searchPosts(category, status, keyword, pageable)
+        @Parameter(description = "페이지 번호. 0부터 시작", example = "0")
+        @RequestParam(defaultValue = "0")
+        page: Int,
+
+        @Parameter(description = "페이지 크기", example = "20")
+        @RequestParam(defaultValue = "20")
+        size: Int,
+
+        @Parameter(description = "정렬. 허용값: boardPostSn, createDt, viewCnt", example = "createDt,desc")
+        @RequestParam(required = false)
+        sort: String?
+    ) = boardPostService.searchPosts(
+        principal.companySn,
+        category,
+        status,
+        keyword,
+        PageableFactory.create(
+            page = page,
+            size = size,
+            sort = sort,
+            allowedProperties = setOf("boardPostSn", "createDt", "viewCnt"),
+            defaultProperty = "boardPostSn"
+        )
+    )
 
     @Operation(summary = "게시글 상세 조회", description = "게시글 상세를 조회하고 조회 수를 증가시킨다.")
     @ApiResponses(
@@ -77,10 +98,11 @@ class BoardPostController(
     )
     @GetMapping("/{boardPostSn}")
     fun getPost(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
         @Parameter(description = "게시글 일련번호", example = "1")
         @PathVariable
         boardPostSn: Long
-    ) = boardPostService.getPost(boardPostSn)
+    ) = boardPostService.getPost(principal.companySn, boardPostSn)
 
     @Operation(summary = "게시글 수정")
     @ApiResponses(
@@ -91,11 +113,12 @@ class BoardPostController(
     )
     @PutMapping("/{boardPostSn}")
     fun updatePost(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
         @Parameter(description = "게시글 일련번호", example = "1")
         @PathVariable
         boardPostSn: Long,
         @RequestBody request: BoardPostDto.UpdateRequest
-    ) = boardPostService.updatePost(boardPostSn, request)
+    ) = boardPostService.updatePost(principal.companySn, boardPostSn, request)
 
     @Operation(summary = "게시글 삭제", description = "게시글을 물리 삭제하지 않고 비활성화한다.")
     @ApiResponses(
@@ -107,10 +130,11 @@ class BoardPostController(
     @DeleteMapping("/{boardPostSn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deletePost(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
         @Parameter(description = "게시글 일련번호", example = "1")
         @PathVariable
         boardPostSn: Long
     ) {
-        boardPostService.deletePost(boardPostSn)
+        boardPostService.deletePost(principal.companySn, boardPostSn)
     }
 }

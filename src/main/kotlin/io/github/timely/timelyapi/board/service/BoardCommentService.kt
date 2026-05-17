@@ -15,9 +15,14 @@ class BoardCommentService(
 ) {
 
     @Transactional
-    fun createComment(authorUserSn: Long, boardPostSn: Long, request: BoardCommentDto.CreateRequest): BoardCommentDto.Response {
+    fun createComment(
+        authorUserSn: Long,
+        companySn: Long,
+        boardPostSn: Long,
+        request: BoardCommentDto.CreateRequest
+    ): BoardCommentDto.Response {
         require(request.content.isNotBlank()) { "Content must not be blank" }
-        boardPostService.getActivePost(boardPostSn)
+        boardPostService.getActivePost(companySn, boardPostSn)
 
         return boardCommentRepository.save(
             BoardComment(
@@ -29,8 +34,8 @@ class BoardCommentService(
     }
 
     @Transactional(readOnly = true)
-    fun searchComments(boardPostSn: Long, pageable: Pageable): PageResponse<BoardCommentDto.Response> {
-        boardPostService.getActivePost(boardPostSn)
+    fun searchComments(companySn: Long, boardPostSn: Long, pageable: Pageable): PageResponse<BoardCommentDto.Response> {
+        boardPostService.getActivePost(companySn, boardPostSn)
         val page = boardCommentRepository.findActiveCommentsByBoardPostSn(boardPostSn, pageable)
             .map { it.toResponse() }
 
@@ -38,7 +43,8 @@ class BoardCommentService(
     }
 
     @Transactional(readOnly = true)
-    fun getComment(boardPostSn: Long, boardCommentSn: Long): BoardCommentDto.Response {
+    fun getComment(companySn: Long, boardPostSn: Long, boardCommentSn: Long): BoardCommentDto.Response {
+        boardPostService.getActivePost(companySn, boardPostSn)
         val comment = getActiveComment(boardCommentSn)
         require(comment.boardPostSn == boardPostSn) { "Board comment not found" }
         return comment.toResponse()
@@ -46,12 +52,14 @@ class BoardCommentService(
 
     @Transactional
     fun updateComment(
+        companySn: Long,
         boardPostSn: Long,
         boardCommentSn: Long,
         request: BoardCommentDto.UpdateRequest
     ): BoardCommentDto.Response {
         require(request.content.isNotBlank()) { "Content must not be blank" }
 
+        boardPostService.getActivePost(companySn, boardPostSn)
         val comment = getActiveComment(boardCommentSn)
         require(comment.boardPostSn == boardPostSn) { "Board comment not found" }
         comment.content = request.content.trim()
@@ -60,7 +68,8 @@ class BoardCommentService(
     }
 
     @Transactional
-    fun deleteComment(boardPostSn: Long, boardCommentSn: Long) {
+    fun deleteComment(companySn: Long, boardPostSn: Long, boardCommentSn: Long) {
+        boardPostService.getActivePost(companySn, boardPostSn)
         val comment = getActiveComment(boardCommentSn)
         require(comment.boardPostSn == boardPostSn) { "Board comment not found" }
         comment.useYn = "N"
