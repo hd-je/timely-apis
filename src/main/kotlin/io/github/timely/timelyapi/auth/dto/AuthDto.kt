@@ -59,6 +59,30 @@ class AuthDto {
 
     @Schema(description = "Login response")
     data class LoginResponse(
+        @field:Schema(description = "JWT access token")
+        val accessToken: String,
+
+        @field:Schema(description = "토큰 타입", example = "Bearer")
+        val tokenType: String = "Bearer",
+
+        @field:Schema(description = "만료 시간(초)", example = "3600")
+        val expiresIn: Long,
+
+        @field:Schema(description = "User serial number", example = "1")
+        val userSn: Long,
+
+        @field:Schema(description = "Email", example = "kimminsu@example.com")
+        val email: String,
+
+        @field:Schema(description = "User name", example = "김민수")
+        val userNm: String,
+
+        @field:Schema(description = "User status", example = "ACTIVE")
+        val userStatus: String
+    )
+
+    @Schema(description = "Current authenticated user response")
+    data class MeResponse(
         @field:Schema(description = "User serial number", example = "1")
         val userSn: Long,
 

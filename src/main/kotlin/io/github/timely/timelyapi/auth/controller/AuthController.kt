@@ -1,10 +1,15 @@
 package io.github.timely.timelyapi.auth.controller
 
 import io.github.timely.timelyapi.auth.dto.AuthDto
+import io.github.timely.timelyapi.auth.jwt.TimelyPrincipal
 import io.github.timely.timelyapi.auth.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,4 +33,15 @@ class AuthController(
     @PostMapping("/login")
     fun login(@RequestBody request: AuthDto.LoginRequest) =
         authService.login(request)
+
+    @Operation(summary = "Current authenticated user")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(responseCode = "401", description = "인증 필요")
+        ]
+    )
+    @GetMapping("/me")
+    fun me(@AuthenticationPrincipal principal: TimelyPrincipal) =
+        authService.me(principal)
 }

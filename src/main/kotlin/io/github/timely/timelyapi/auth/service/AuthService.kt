@@ -1,6 +1,9 @@
 package io.github.timely.timelyapi.auth.service
 
 import io.github.timely.timelyapi.auth.dto.AuthDto
+import io.github.timely.timelyapi.auth.jwt.JwtProperties
+import io.github.timely.timelyapi.auth.jwt.JwtTokenProvider
+import io.github.timely.timelyapi.auth.jwt.TimelyPrincipal
 import io.github.timely.timelyapi.company.repository.CompanyRepository
 import io.github.timely.timelyapi.department.repository.DepartmentRepository
 import io.github.timely.timelyapi.position.repository.PositionRepository
@@ -16,7 +19,9 @@ class AuthService(
     private val companyRepository: CompanyRepository,
     private val departmentRepository: DepartmentRepository,
     private val positionRepository: PositionRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtProperties: JwtProperties
 ) {
 
     @Transactional
@@ -96,10 +101,21 @@ class AuthService(
         }
 
         return AuthDto.LoginResponse(
+            accessToken = jwtTokenProvider.createAccessToken(user),
+            expiresIn = jwtProperties.accessTokenExpirationMs / 1000,
             userSn = user.userSn!!,
             email = user.email,
             userNm = user.userNm,
             userStatus = user.userStatus
+        )
+    }
+
+    fun me(principal: TimelyPrincipal): AuthDto.MeResponse {
+        return AuthDto.MeResponse(
+            userSn = principal.userSn,
+            email = principal.email,
+            userNm = principal.userNm,
+            userStatus = principal.userStatus
         )
     }
 

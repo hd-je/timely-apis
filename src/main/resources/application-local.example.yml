@@ -12,3 +12,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
+
+jwt:
+  secret: change-this-secret-key-to-at-least-32-bytes
+  access-token-expiration-ms: 3600000

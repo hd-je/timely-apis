@@ -24,6 +24,7 @@ class SecurityConfig(
                 it.requestMatchers(
                     "/v1/auth/signup",
                     "/v1/auth/login",
+                    "/v1/common-codes",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**"
