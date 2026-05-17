@@ -17,10 +17,10 @@ class AuthDto {
         @field:Schema(description = "Name", example = "김민수")
         val name: String,
 
-        @field:Schema(description = "Password. At least 8 characters including letters, numbers, and special characters", example = "Password!123")
+        @field:Schema(description = "Password. At least 8 characters including letters, numbers, and special characters", example = "1234")
         val password: String,
 
-        @field:Schema(description = "Password confirmation", example = "Password!123")
+        @field:Schema(description = "Password confirmation", example = "1234")
         val passwordConfirm: String,
 
         @field:Schema(description = "Phone number", example = "010-1111-2222")
@@ -53,7 +53,7 @@ class AuthDto {
         @field:Schema(description = "Email", example = "kimminsu@example.com")
         val email: String,
 
-        @field:Schema(description = "Password", example = "Password!123")
+        @field:Schema(description = "Password", example = "1234")
         val password: String
     )
 

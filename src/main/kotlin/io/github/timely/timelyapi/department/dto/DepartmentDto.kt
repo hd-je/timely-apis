@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class DepartmentDto {
-    @Schema(description = "Department create request")
+    @Schema(name = "DepartmentCreateRequest", description = "Department create request")
     data class CreateRequest(
         @field:Schema(description = "Company serial number", example = "1")
         val companySn: Long,
@@ -16,7 +16,7 @@ class DepartmentDto {
         val useYn: String = "Y"
     )
 
-    @Schema(description = "Department update request")
+    @Schema(name = "DepartmentUpdateRequest", description = "Department update request")
     data class UpdateRequest(
         @field:Schema(description = "Company serial number", example = "1")
         val companySn: Long,
@@ -28,13 +28,13 @@ class DepartmentDto {
         val useYn: String = "Y"
     )
 
-    @Schema(description = "Use flag update request")
+    @Schema(name = "DepartmentUseYnRequest", description = "Use flag update request")
     data class UseYnRequest(
         @field:Schema(description = "Use flag", example = "N")
         val useYn: String
     )
 
-    @Schema(description = "Department detail response")
+    @Schema(name = "DepartmentResponse", description = "Department detail response")
     data class Response(
         @field:Schema(description = "Department serial number", example = "1")
         val deptSn: Long,
@@ -55,7 +55,7 @@ class DepartmentDto {
         val updateDt: LocalDateTime?
     )
 
-    @Schema(description = "Department list response")
+    @Schema(name = "DepartmentSimpleResponse", description = "Department list response")
     data class SimpleResponse(
         @field:Schema(description = "Department serial number", example = "1")
         val deptSn: Long,

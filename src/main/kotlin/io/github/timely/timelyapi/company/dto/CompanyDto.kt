@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class CompanyDto {
-    @Schema(description = "회사 상세 응답")
+    @Schema(name = "CompanyResponse", description = "회사 상세 응답")
     data class Response(
         @field:Schema(description = "회사 일련번호", example = "1")
         val companySn: Long,
@@ -22,7 +22,7 @@ class CompanyDto {
         val updateDt: LocalDateTime?
     )
 
-    @Schema(description = "회사 목록 응답")
+    @Schema(name = "CompanySimpleResponse", description = "회사 목록 응답")
     data class SimpleResponse(
         @field:Schema(description = "회사 일련번호", example = "1")
         val companySn: Long,

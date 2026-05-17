@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class PositionDto {
-    @Schema(description = "Position create request")
+    @Schema(name = "PositionCreateRequest", description = "Position create request")
     data class CreateRequest(
         @field:Schema(description = "Company serial number", example = "1")
         val companySn: Long,
@@ -22,7 +22,7 @@ class PositionDto {
         val useYn: String = "Y"
     )
 
-    @Schema(description = "Position update request")
+    @Schema(name = "PositionUpdateRequest", description = "Position update request")
     data class UpdateRequest(
         @field:Schema(description = "Company serial number", example = "1")
         val companySn: Long,
@@ -40,13 +40,13 @@ class PositionDto {
         val useYn: String = "Y"
     )
 
-    @Schema(description = "Use flag update request")
+    @Schema(name = "PositionUseYnRequest", description = "Use flag update request")
     data class UseYnRequest(
         @field:Schema(description = "Use flag", example = "N")
         val useYn: String
     )
 
-    @Schema(description = "Position response")
+    @Schema(name = "PositionResponse", description = "Position response")
     data class Response(
         @field:Schema(description = "Position serial number", example = "1")
         val positionSn: Long,

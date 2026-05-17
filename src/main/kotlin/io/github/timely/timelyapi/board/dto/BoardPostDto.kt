@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class BoardPostDto {
-    @Schema(description = "게시글 생성 요청")
+    @Schema(name = "BoardPostCreateRequest", description = "게시글 생성 요청")
     data class CreateRequest(
         @field:Schema(description = "카테고리 코드", example = "NOTICE")
         val category: String,
@@ -19,7 +19,7 @@ class BoardPostDto {
         val content: String
     )
 
-    @Schema(description = "게시글 수정 요청")
+    @Schema(name = "BoardPostUpdateRequest", description = "게시글 수정 요청")
     data class UpdateRequest(
         @field:Schema(description = "카테고리 코드", example = "NOTICE")
         val category: String,
@@ -34,7 +34,7 @@ class BoardPostDto {
         val content: String
     )
 
-    @Schema(description = "게시글 목록 응답")
+    @Schema(name = "BoardPostSimpleResponse", description = "게시글 목록 응답")
     data class SimpleResponse(
         @field:Schema(description = "게시글 일련번호", example = "1")
         val boardPostSn: Long,
@@ -67,7 +67,7 @@ class BoardPostDto {
         val updateDt: LocalDateTime?
     )
 
-    @Schema(description = "게시글 상세 응답")
+    @Schema(name = "BoardPostResponse", description = "게시글 상세 응답")
     data class Response(
         @field:Schema(description = "게시글 일련번호", example = "1")
         val boardPostSn: Long,

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
 class UserDto {
-    @Schema(description = "User detail response")
+    @Schema(name = "UserResponse", description = "User detail response")
     data class Response(
         @field:Schema(description = "User serial number", example = "1")
         val userSn: Long,
@@ -43,7 +43,7 @@ class UserDto {
         val updateDt: LocalDateTime?
     )
 
-    @Schema(description = "User list response")
+    @Schema(name = "UserSimpleResponse", description = "User list response")
     data class SimpleResponse(
         @field:Schema(description = "User serial number", example = "1")
         val userSn: Long,
@@ -70,7 +70,7 @@ class UserDto {
         val userStatus: String
     )
 
-    @Schema(description = "Email exists response")
+    @Schema(name = "UserEmailExistsResponse", description = "Email exists response")
     data class EmailExistsResponse(
         @field:Schema(description = "Email", example = "kimminsu@example.com")
         val email: String,
