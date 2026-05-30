@@ -13,6 +13,8 @@ interface UserRepository : JpaRepository<TimelyUser, Long> {
 
     fun findByEmailIgnoreCaseAndUseYn(email: String, useYn: String): TimelyUser?
 
+    fun findByUserSnAndCompanySnAndUseYn(userSn: Long, companySn: Long, useYn: String): TimelyUser?
+
     @Query(
         """
         select u
