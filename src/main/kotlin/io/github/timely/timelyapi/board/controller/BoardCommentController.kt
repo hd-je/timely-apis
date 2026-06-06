@@ -65,10 +65,11 @@ class BoardCommentController(
         @Parameter(description = "페이지 크기", example = "20")
         @RequestParam(defaultValue = "20")
         size: Int,
-        @Parameter(description = "정렬. 허용값: boardCommentSn, createDt", example = "createDt,asc")
+        @Parameter(description = "정렬. 댓글은 부모 댓글 아래에 답글이 오도록 기본 그룹 정렬된다. 허용값: boardCommentSn, createDt", example = "createDt,asc")
         @RequestParam(required = false)
         sort: String?
     ) = boardCommentService.searchComments(
+        principal.userSn,
         principal.companySn,
         boardPostSn,
         PageableFactory.create(
@@ -97,9 +98,9 @@ class BoardCommentController(
         @Parameter(description = "댓글 일련번호", example = "10")
         @PathVariable
         boardCommentSn: Long
-    ) = boardCommentService.getComment(principal.companySn, boardPostSn, boardCommentSn)
+    ) = boardCommentService.getComment(principal.userSn, principal.companySn, boardPostSn, boardCommentSn)
 
-    @Operation(summary = "댓글 수정")
+    @Operation(summary = "댓글 수정", description = "작성자만 댓글을 수정할 수 있다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "수정 성공"),
@@ -116,9 +117,9 @@ class BoardCommentController(
         @PathVariable
         boardCommentSn: Long,
         @RequestBody request: BoardCommentDto.UpdateRequest
-    ) = boardCommentService.updateComment(principal.companySn, boardPostSn, boardCommentSn, request)
+    ) = boardCommentService.updateComment(principal.userSn, principal.companySn, boardPostSn, boardCommentSn, request)
 
-    @Operation(summary = "댓글 삭제", description = "댓글을 물리 삭제하지 않고 비활성화한다.")
+    @Operation(summary = "댓글 삭제", description = "작성자만 댓글을 물리 삭제하지 않고 비활성화할 수 있다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "204", description = "삭제 성공"),
@@ -136,6 +137,48 @@ class BoardCommentController(
         @PathVariable
         boardCommentSn: Long
     ) {
-        boardCommentService.deleteComment(principal.companySn, boardPostSn, boardCommentSn)
+        boardCommentService.deleteComment(principal.userSn, principal.companySn, boardPostSn, boardCommentSn)
+    }
+
+    @Operation(summary = "댓글 좋아요", description = "현재 사용자가 댓글에 좋아요를 추가한다.")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "좋아요 성공"),
+            ApiResponse(responseCode = "400", description = "게시글 또는 댓글이 존재하지 않음")
+        ]
+    )
+    @PostMapping("/{boardCommentSn}/likes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun likeComment(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @Parameter(description = "게시글 일련번호", example = "1")
+        @PathVariable
+        boardPostSn: Long,
+        @Parameter(description = "댓글 일련번호", example = "10")
+        @PathVariable
+        boardCommentSn: Long
+    ) {
+        boardCommentService.likeComment(principal.userSn, principal.companySn, boardPostSn, boardCommentSn)
+    }
+
+    @Operation(summary = "댓글 좋아요 취소", description = "현재 사용자의 댓글 좋아요를 취소한다.")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "좋아요 취소 성공"),
+            ApiResponse(responseCode = "400", description = "게시글 또는 댓글이 존재하지 않음")
+        ]
+    )
+    @DeleteMapping("/{boardCommentSn}/likes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun unlikeComment(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @Parameter(description = "게시글 일련번호", example = "1")
+        @PathVariable
+        boardPostSn: Long,
+        @Parameter(description = "댓글 일련번호", example = "10")
+        @PathVariable
+        boardCommentSn: Long
+    ) {
+        boardCommentService.unlikeComment(principal.userSn, principal.companySn, boardPostSn, boardCommentSn)
     }
 }

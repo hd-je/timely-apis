@@ -9,12 +9,12 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "tb_board_comment")
-class BoardComment(
+@Table(name = "tb_board_post_like")
+class BoardPostLike(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_comment_sn")
-    val boardCommentSn: Long? = null,
+    @Column(name = "board_post_like_sn")
+    val boardPostLikeSn: Long? = null,
 
     @Column(name = "create_dt", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
@@ -25,14 +25,8 @@ class BoardComment(
     @Column(name = "board_post_sn", nullable = false)
     var boardPostSn: Long,
 
-    @Column(name = "author_user_sn", nullable = false)
-    var authorUserSn: Long,
-
-    @Column(name = "parent_comment_sn")
-    var parentCommentSn: Long? = null,
-
-    @Column(name = "content", nullable = false, columnDefinition = "text")
-    var content: String,
+    @Column(name = "user_sn", nullable = false)
+    var userSn: Long,
 
     @Column(name = "use_yn", nullable = false, columnDefinition = "char(1)")
     var useYn: String = "Y"
