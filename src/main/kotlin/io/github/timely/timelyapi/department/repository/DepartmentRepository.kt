@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DepartmentRepository : JpaRepository<Department, Long> {
 
+    fun findByDeptSnAndCompanySnAndUseYn(deptSn: Long, companySn: Long, useYn: String): Department?
+
     @Query(
         """
         select d

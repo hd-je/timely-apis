@@ -115,6 +115,32 @@ class BoardPostController(
         size: Int
     ) = boardPostService.getRecentNotices(principal.companySn, size)
 
+    @Operation(
+        summary = "게시판 사이드바 집계 조회",
+        description = "게시판 화면 사이드바에 필요한 카테고리별 건수, 최근 공지, 현재 사용자 북마크와 작성글 요약을 조회한다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공")
+        ]
+    )
+    @GetMapping("/sidebar")
+    fun getSidebar(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @Parameter(description = "최근 공지 조회 건수. 최대 10건", example = "3")
+        @RequestParam(defaultValue = "3")
+        recentNoticeSize: Int,
+
+        @Parameter(description = "최근 북마크 게시글 조회 건수. 최대 10건", example = "5")
+        @RequestParam(defaultValue = "5")
+        recentBookmarkSize: Int
+    ) = boardPostService.getSidebar(
+        userSn = principal.userSn,
+        companySn = principal.companySn,
+        recentNoticeSize = recentNoticeSize,
+        recentBookmarkSize = recentBookmarkSize
+    )
+
     @Operation(summary = "게시글 상세 조회", description = "게시글 상세를 조회하고 조회 수를 증가시킨다.")
     @ApiResponses(
         value = [

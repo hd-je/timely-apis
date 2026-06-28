@@ -11,6 +11,7 @@ import io.github.timely.timelyapi.board.repository.BoardPostDetailProjection
 import io.github.timely.timelyapi.board.repository.BoardPostLikeRepository
 import io.github.timely.timelyapi.board.repository.BoardPostRepository
 import io.github.timely.timelyapi.board.repository.BoardPostSummaryProjection
+import io.github.timely.timelyapi.board.repository.RecentBookmarkProjection
 import io.github.timely.timelyapi.common.PageResponse
 import io.github.timely.timelyapi.commoncode.repository.CommonCodeRepository
 import io.github.timely.timelyapi.user.repository.UserRepository
@@ -114,6 +115,29 @@ class BoardPostService(
                 createDt = it.createDt
             )
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getSidebar(userSn: Long, companySn: Long, recentNoticeSize: Int, recentBookmarkSize: Int): BoardPostDto.SidebarResponse {
+        val categoryNames = getCodeNameMap("BOARD_CATEGORY")
+        val bookmarkCount = boardPostBookmarkRepository.countActiveBookmarks(userSn, companySn)
+        val recentBookmarks = boardPostBookmarkRepository.findRecentActiveBookmarks(
+            userSn = userSn,
+            companySn = companySn,
+            pageable = PageRequest.of(0, recentBookmarkSize.coerceIn(1, 10))
+        ).content.map { it.toRecentBookmarkResponse(categoryNames) }
+
+        return BoardPostDto.SidebarResponse(
+            categoryCounts = getCategoryCounts(companySn),
+            recentNotices = getRecentNotices(companySn, recentNoticeSize),
+            bookmarks = BoardPostDto.BookmarkSummaryResponse(
+                count = bookmarkCount,
+                recentPosts = recentBookmarks
+            ),
+            authoredPosts = BoardPostDto.AuthoredPostSummaryResponse(
+                count = boardPostRepository.countByCompanySnAndAuthorUserSnAndUseYn(companySn, userSn, "Y")
+            )
+        )
     }
 
     @Transactional
@@ -269,6 +293,16 @@ class BoardPostService(
             useYn = useYn,
             createDt = createDt,
             updateDt = updateDt
+        )
+
+    private fun RecentBookmarkProjection.toRecentBookmarkResponse(categoryNames: Map<String, String>) =
+        BoardPostDto.RecentBookmarkResponse(
+            boardPostSn = boardPostSn,
+            category = category,
+            categoryName = categoryNames[category],
+            title = title,
+            createDt = createDt,
+            bookmarkedDt = bookmarkedDt
         )
 
     private fun BoardPost.toResponse(

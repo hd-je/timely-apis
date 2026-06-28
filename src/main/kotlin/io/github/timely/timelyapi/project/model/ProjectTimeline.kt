@@ -6,17 +6,16 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "tb_project")
-class Project(
+@Table(name = "tb_project_timeline")
+class ProjectTimeline(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_sn")
-    val projectSn: Long? = null,
+    @Column(name = "project_timeline_sn")
+    val projectTimelineSn: Long? = null,
 
     @Column(name = "create_dt", insertable = false, updatable = false)
     var createDt: LocalDateTime? = null,
@@ -24,29 +23,17 @@ class Project(
     @Column(name = "update_dt", insertable = false, updatable = false)
     var updateDt: LocalDateTime? = null,
 
-    @Column(name = "company_sn", nullable = false)
-    var companySn: Long,
+    @Column(name = "project_sn", nullable = false)
+    var projectSn: Long,
 
-    @Column(name = "project_nm", nullable = false, length = 200)
-    var projectNm: String,
+    @Column(name = "phase_nm", nullable = false, length = 200)
+    var phaseNm: String,
 
     @Column(name = "description", columnDefinition = "text")
     var description: String? = null,
 
-    @Column(name = "owner_user_sn", nullable = false)
-    var ownerUserSn: Long,
-
     @Column(name = "status", nullable = false, length = 30)
-    var status: String,
-
-    @Column(name = "priority", nullable = false, length = 30)
-    var priority: String = "MEDIUM",
-
-    @Column(name = "visibility", nullable = false, length = 30)
-    var visibility: String = "PRIVATE",
-
-    @Column(name = "progress_rate", nullable = false)
-    var progressRate: Int = 0,
+    var status: String = "PLANNED",
 
     @Column(name = "start_dt")
     var startDt: LocalDate? = null,
@@ -54,11 +41,8 @@ class Project(
     @Column(name = "end_dt")
     var endDt: LocalDate? = null,
 
-    @Column(name = "budget_amt")
-    var budgetAmt: BigDecimal? = null,
-
-    @Column(name = "client_nm", length = 200)
-    var clientNm: String? = null,
+    @Column(name = "sort_seq", nullable = false)
+    var sortSeq: Int = 0,
 
     @Column(name = "use_yn", nullable = false, columnDefinition = "char(1)")
     var useYn: String = "Y"

@@ -173,6 +173,8 @@ interface BoardPostRepository : JpaRepository<BoardPost, Long> {
 
     fun countByCompanySnAndUseYn(companySn: Long, useYn: String): Long
 
+    fun countByCompanySnAndAuthorUserSnAndUseYn(companySn: Long, authorUserSn: Long, useYn: String): Long
+
     fun findByCompanySnAndCategoryAndUseYn(companySn: Long, category: String, useYn: String, pageable: Pageable): Page<BoardPost>
 }
 

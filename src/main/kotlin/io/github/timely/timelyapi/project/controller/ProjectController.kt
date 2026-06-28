@@ -29,7 +29,7 @@ class ProjectController(
     private val projectService: ProjectService
 ) {
 
-    @Operation(summary = "프로젝트 생성", description = "프로젝트를 생성하고 태그를 저장한다. 상태는 활성 공통코드여야 한다.")
+    @Operation(summary = "프로젝트 생성", description = "프로젝트를 생성하고 태그, 참여자, 예외 조회 권한, 참고 파일 메타데이터를 저장한다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201", description = "생성 성공"),
@@ -41,7 +41,7 @@ class ProjectController(
     fun createProject(
         @AuthenticationPrincipal principal: TimelyPrincipal,
         @RequestBody request: ProjectDto.CreateRequest
-    ) = projectService.createProject(principal.companySn, request)
+    ) = projectService.createProject(principal.userSn, principal.companySn, request)
 
     @Operation(summary = "프로젝트 목록 검색", description = "상태와 키워드 조건으로 프로젝트를 페이징 조회한다.")
     @ApiResponses(
@@ -69,7 +69,7 @@ class ProjectController(
         @RequestParam(defaultValue = "20")
         size: Int,
 
-        @Parameter(description = "정렬. 허용값: projectSn, projectNm, status, progressRate, startDt, endDt, createDt", example = "createDt,desc")
+        @Parameter(description = "정렬. 허용값: projectSn, projectNm, status, priority, visibility, progressRate, startDt, endDt, budgetAmt, clientNm, createDt", example = "createDt,desc")
         @RequestParam(required = false)
         sort: String?
     ) = projectService.searchProjects(
@@ -80,7 +80,19 @@ class ProjectController(
             page = page,
             size = size,
             sort = sort,
-            allowedProperties = setOf("projectSn", "projectNm", "status", "progressRate", "startDt", "endDt", "createDt"),
+            allowedProperties = setOf(
+                "projectSn",
+                "projectNm",
+                "status",
+                "priority",
+                "visibility",
+                "progressRate",
+                "startDt",
+                "endDt",
+                "budgetAmt",
+                "clientNm",
+                "createDt"
+            ),
             defaultProperty = "projectSn"
         )
     )
@@ -96,7 +108,7 @@ class ProjectController(
         @AuthenticationPrincipal principal: TimelyPrincipal
     ) = projectService.getStatusCounts(principal.companySn)
 
-    @Operation(summary = "프로젝트 상세 조회", description = "프로젝트 상세와 태그 목록을 조회한다.")
+    @Operation(summary = "프로젝트 상세 조회", description = "프로젝트 상세, 태그, 참여자, 예외 조회 권한, 참고 파일 목록을 조회한다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -111,7 +123,7 @@ class ProjectController(
         projectSn: Long
     ) = projectService.getProject(principal.companySn, projectSn)
 
-    @Operation(summary = "프로젝트 수정", description = "프로젝트 기본 정보와 태그를 수정한다.")
+    @Operation(summary = "프로젝트 수정", description = "프로젝트 기본 정보, 태그, 참여자, 예외 조회 권한, 참고 파일 메타데이터를 수정한다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "수정 성공"),
@@ -125,7 +137,7 @@ class ProjectController(
         @PathVariable
         projectSn: Long,
         @RequestBody request: ProjectDto.UpdateRequest
-    ) = projectService.updateProject(principal.companySn, projectSn, request)
+    ) = projectService.updateProject(principal.userSn, principal.companySn, projectSn, request)
 
     @Operation(summary = "프로젝트 삭제", description = "프로젝트를 물리 삭제하지 않고 비활성화한다.")
     @ApiResponses(
