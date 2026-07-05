@@ -24,6 +24,9 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/companies", "/v1/companies/*").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/departments", "/v1/departments/*").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/positions", "/v1/positions/*").permitAll()
                     .requestMatchers(
                     "/v1/auth/signup",
                     "/v1/auth/login",
