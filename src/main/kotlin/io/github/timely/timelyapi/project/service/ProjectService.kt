@@ -51,7 +51,6 @@ class ProjectService(
             status = request.status,
             priority = request.priority,
             visibility = request.visibility,
-            progressRate = request.progressRate,
             startDt = request.startDt,
             endDt = request.endDt,
             budgetAmt = request.budgetAmt,
@@ -72,7 +71,7 @@ class ProjectService(
                 status = request.status.trim(),
                 priority = request.priority.trim(),
                 visibility = request.visibility.trim(),
-                progressRate = request.progressRate,
+                progressRate = 0,
                 startDt = request.startDt,
                 endDt = request.endDt,
                 budgetAmt = request.budgetAmt,
@@ -135,7 +134,6 @@ class ProjectService(
             status = request.status,
             priority = request.priority,
             visibility = request.visibility,
-            progressRate = request.progressRate,
             startDt = request.startDt,
             endDt = request.endDt,
             budgetAmt = request.budgetAmt,
@@ -154,7 +152,7 @@ class ProjectService(
         project.status = request.status.trim()
         project.priority = request.priority.trim()
         project.visibility = request.visibility.trim()
-        project.progressRate = request.progressRate
+        project.progressRate = calculateProgressRate(projectSn)
         project.startDt = request.startDt
         project.endDt = request.endDt
         project.budgetAmt = request.budgetAmt
@@ -186,6 +184,13 @@ class ProjectService(
             .forEach { it.useYn = "N" }
     }
 
+    internal fun recalculateProgressRate(companySn: Long, projectSn: Long): Int {
+        val project = getActiveProject(companySn, projectSn)
+        val progressRate = calculateProgressRate(project.projectSn!!)
+        project.progressRate = progressRate
+        return progressRate
+    }
+
     internal fun getActiveProject(companySn: Long, projectSn: Long): Project {
         return projectRepository.findByProjectSnAndCompanySnAndUseYn(projectSn, companySn, "Y")
             ?: throw IllegalArgumentException("Project not found")
@@ -198,7 +203,6 @@ class ProjectService(
         status: String,
         priority: String,
         visibility: String,
-        progressRate: Int,
         startDt: LocalDate?,
         endDt: LocalDate?,
         budgetAmt: BigDecimal?,
@@ -213,7 +217,6 @@ class ProjectService(
         require(status.isNotBlank()) { "Status must not be blank" }
         require(priority.isNotBlank()) { "Priority must not be blank" }
         require(visibility.isNotBlank()) { "Visibility must not be blank" }
-        require(progressRate in 0..100) { "Progress rate must be between 0 and 100" }
         require(startDt == null || endDt == null || !endDt.isBefore(startDt)) { "End date must not be before start date" }
         require(budgetAmt == null || budgetAmt.signum() >= 0) { "Budget amount must be zero or greater" }
         require(clientNm == null || clientNm.length <= 200) { "Client name must be 200 characters or less" }
@@ -351,6 +354,7 @@ class ProjectService(
         ProjectDto.SimpleResponse(
             projectSn = projectSn!!,
             projectNm = projectNm,
+            description = description,
             status = status,
             priority = priority,
             visibility = visibility,
@@ -454,12 +458,13 @@ class ProjectService(
 
     private fun Project.activeDetailSummary(): ProjectDto.DetailSummaryResponse {
         val activeProjectSn = projectSn!!
+        val tasks = projectTaskRepository.findByProjectSnAndUseYnOrderBySortSeqAscDueDtAscProjectTaskSnAsc(activeProjectSn, "Y")
         return ProjectDto.DetailSummaryResponse(
             task = ProjectDto.TaskSummaryResponse(
-                totalCount = projectTaskRepository.countByProjectSnAndUseYn(activeProjectSn, "Y"),
-                completedCount = projectTaskRepository.countByProjectSnAndStatusAndUseYn(activeProjectSn, "COMPLETED", "Y"),
-                inProgressCount = projectTaskRepository.countByProjectSnAndStatusAndUseYn(activeProjectSn, "IN_PROGRESS", "Y"),
-                pendingCount = projectTaskRepository.countByProjectSnAndStatusAndUseYn(activeProjectSn, "PENDING", "Y")
+                totalCount = tasks.size.toLong(),
+                completedCount = tasks.count { it.status.isDoneStatus() }.toLong(),
+                inProgressCount = tasks.count { it.status == "IN_PROGRESS" }.toLong(),
+                pendingCount = tasks.count { it.status == "PENDING" }.toLong()
             ),
             update = ProjectDto.UpdateSummaryResponse(
                 totalCount = projectUpdateRepository.countByProjectSnAndUseYn(activeProjectSn, "Y"),
@@ -484,4 +489,25 @@ class ProjectService(
             )
         )
     }
+
+    private fun calculateProgressRate(projectSn: Long): Int {
+        val tasks = projectTaskRepository.findByProjectSnAndUseYnOrderBySortSeqAscDueDtAscProjectTaskSnAsc(projectSn, "Y")
+        if (tasks.isEmpty()) {
+            return 0
+        }
+
+        return kotlin.math.round(tasks.sumOf { it.status.progressRate() }.toDouble() / tasks.size).toInt()
+            .coerceIn(0, 100)
+    }
+
+    private fun String.progressRate(): Int {
+        return when (this) {
+            "IN_PROGRESS" -> 30
+            "REVIEW" -> 70
+            "DONE", "COMPLETED" -> 100
+            else -> 0
+        }
+    }
+
+    private fun String.isDoneStatus() = this == "DONE" || this == "COMPLETED"
 }

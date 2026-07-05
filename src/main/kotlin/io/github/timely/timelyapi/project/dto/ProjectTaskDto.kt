@@ -55,7 +55,7 @@ class ProjectTaskDto {
 
     @Schema(name = "ProjectTaskStatusRequest", description = "프로젝트 작업 상태 변경 요청")
     data class StatusRequest(
-        @field:Schema(description = "작업 상태 코드", example = "COMPLETED")
+        @field:Schema(description = "작업 상태 코드", example = "DONE")
         val status: String
     )
 

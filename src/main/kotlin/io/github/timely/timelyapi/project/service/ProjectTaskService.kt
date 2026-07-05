@@ -44,6 +44,7 @@ class ProjectTaskService(
             )
         )
         recordTaskChangeUpdate(userSn, projectSn, task, "작업 생성")
+        projectService.recalculateProgressRate(companySn, projectSn)
 
         return task.toResponse()
     }
@@ -55,7 +56,7 @@ class ProjectTaskService(
 
         return ProjectTaskDto.ListResponse(
             totalCount = tasks.size.toLong(),
-            completedCount = tasks.count { it.status == "COMPLETED" }.toLong(),
+            completedCount = tasks.count { it.status.isDoneStatus() }.toLong(),
             inProgressCount = tasks.count { it.status == "IN_PROGRESS" }.toLong(),
             pendingCount = tasks.count { it.status == "PENDING" }.toLong(),
             tasks = tasks.map { it.toResponse() }
@@ -94,6 +95,7 @@ class ProjectTaskService(
         if (oldStatus != task.status) {
             recordTaskChangeUpdate(userSn, projectSn, task, statusChangeTitle(task.status))
         }
+        projectService.recalculateProgressRate(companySn, projectSn)
 
         return task.toResponse()
     }
@@ -117,6 +119,7 @@ class ProjectTaskService(
         if (oldStatus != task.status) {
             recordTaskChangeUpdate(userSn, projectSn, task, statusChangeTitle(task.status))
         }
+        projectService.recalculateProgressRate(companySn, projectSn)
 
         return task.toResponse()
     }
@@ -125,6 +128,7 @@ class ProjectTaskService(
     fun deleteTask(companySn: Long, projectSn: Long, projectTaskSn: Long) {
         projectService.getActiveProject(companySn, projectSn)
         getActiveTask(projectSn, projectTaskSn).useYn = "N"
+        projectService.recalculateProgressRate(companySn, projectSn)
     }
 
     private fun getActiveTask(projectSn: Long, projectTaskSn: Long): ProjectTask {
@@ -172,14 +176,15 @@ class ProjectTaskService(
 
     private fun statusChangeTitle(status: String): String {
         return when (status) {
-            "COMPLETED" -> "작업 완료"
+            "DONE", "COMPLETED" -> "작업 완료"
+            "REVIEW" -> "작업 검토"
             "IN_PROGRESS" -> "작업 시작"
             else -> "작업 상태 변경"
         }
     }
 
     private fun completeDtFor(status: String, currentCompleteDt: LocalDateTime? = null): LocalDateTime? {
-        return if (status == "COMPLETED") currentCompleteDt ?: LocalDateTime.now() else null
+        return if (status.isDoneStatus()) currentCompleteDt ?: LocalDateTime.now() else null
     }
 
     private fun statusName(status: String) = codeName("PROJECT_TASK_STATUS", status) ?: status
@@ -193,6 +198,8 @@ class ProjectTaskService(
     }
 
     private fun String?.normalized() = this?.trim()?.takeIf { it.isNotBlank() }
+
+    private fun String.isDoneStatus() = this == "DONE" || this == "COMPLETED"
 
     private fun ProjectTask.toResponse() =
         ProjectTaskDto.Response(

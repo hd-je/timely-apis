@@ -26,8 +26,8 @@ class ProjectDto {
         @field:Schema(description = "프로젝트 공개 범위 코드", example = "PRIVATE")
         val visibility: String = "PRIVATE",
 
-        @field:Schema(description = "진행률. 0부터 100까지 입력", example = "75")
-        val progressRate: Int,
+        @field:Schema(description = "진행률. 작업 상태 기준으로 서버에서 자동 계산하며 요청값은 사용하지 않음", example = "0")
+        val progressRate: Int = 0,
 
         @field:Schema(description = "시작일", example = "2026-05-01")
         val startDt: LocalDate?,
@@ -77,8 +77,8 @@ class ProjectDto {
         @field:Schema(description = "프로젝트 공개 범위 코드", example = "PRIVATE")
         val visibility: String = "PRIVATE",
 
-        @field:Schema(description = "진행률. 0부터 100까지 입력", example = "100")
-        val progressRate: Int,
+        @field:Schema(description = "진행률. 작업 상태 기준으로 서버에서 자동 계산하며 요청값은 사용하지 않음", example = "68")
+        val progressRate: Int = 0,
 
         @field:Schema(description = "시작일", example = "2026-05-01")
         val startDt: LocalDate?,
@@ -139,6 +139,9 @@ class ProjectDto {
 
         @field:Schema(description = "프로젝트명", example = "웹사이트 리뉴얼 프로젝트")
         val projectNm: String,
+
+        @field:Schema(description = "프로젝트 설명", example = "회사 대표 웹사이트를 새 디자인 시스템 기준으로 개편합니다.")
+        val description: String?,
 
         @field:Schema(description = "프로젝트 상태 코드", example = "IN_PROGRESS")
         val status: String,
