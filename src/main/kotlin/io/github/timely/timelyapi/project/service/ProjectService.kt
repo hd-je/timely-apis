@@ -464,7 +464,8 @@ class ProjectService(
                 totalCount = tasks.size.toLong(),
                 completedCount = tasks.count { it.status.isDoneStatus() }.toLong(),
                 inProgressCount = tasks.count { it.status == "IN_PROGRESS" }.toLong(),
-                pendingCount = tasks.count { it.status == "PENDING" }.toLong()
+                pendingCount = tasks.count { it.status == "PENDING" }.toLong(),
+                reviewCount = tasks.count { it.status == "REVIEW" }.toLong()
             ),
             update = ProjectDto.UpdateSummaryResponse(
                 totalCount = projectUpdateRepository.countByProjectSnAndUseYn(activeProjectSn, "Y"),

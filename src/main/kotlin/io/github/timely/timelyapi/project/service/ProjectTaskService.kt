@@ -59,6 +59,7 @@ class ProjectTaskService(
             completedCount = tasks.count { it.status.isDoneStatus() }.toLong(),
             inProgressCount = tasks.count { it.status == "IN_PROGRESS" }.toLong(),
             pendingCount = tasks.count { it.status == "PENDING" }.toLong(),
+            reviewCount = tasks.count { it.status == "REVIEW" }.toLong(),
             tasks = tasks.map { it.toResponse() }
         )
     }

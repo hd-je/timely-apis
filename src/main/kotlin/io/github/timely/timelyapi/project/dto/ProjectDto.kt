@@ -285,7 +285,10 @@ class ProjectDto {
         val inProgressCount: Long,
 
         @field:Schema(description = "대기 작업 수", example = "2")
-        val pendingCount: Long
+        val pendingCount: Long,
+
+        @field:Schema(description = "검토 작업 수", example = "1")
+        val reviewCount: Long
     )
 
     @Schema(name = "ProjectUpdateSummaryCountResponse", description = "프로젝트 업데이트 요약 응답")

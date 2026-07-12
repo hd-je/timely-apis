@@ -73,6 +73,9 @@ class ProjectTaskDto {
         @field:Schema(description = "대기 작업 수", example = "2")
         val pendingCount: Long,
 
+        @field:Schema(description = "검토 작업 수", example = "1")
+        val reviewCount: Long,
+
         @field:Schema(description = "작업 목록")
         val tasks: List<Response>
     )
