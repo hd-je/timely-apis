@@ -12,9 +12,13 @@ import io.github.timely.timelyapi.schedule.repository.ScheduleRepository
 import io.github.timely.timelyapi.user.model.TimelyUser
 import io.github.timely.timelyapi.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 
 @Service
 class ScheduleService(
@@ -121,6 +125,23 @@ class ScheduleService(
             status = status,
             pageable = pageable
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun searchUpcomingSchedules(companySn: Long, userSn: Long): List<ScheduleDto.Response> {
+        val today = LocalDate.now(ZoneId.of("Asia/Seoul"))
+        val from = today.atStartOfDay()
+        val to = today.plusDays(7).atTime(LocalTime.MAX)
+        return searchMySchedules(
+            companySn = companySn,
+            userSn = userSn,
+            startDt = from,
+            endDt = to,
+            projectSn = null,
+            scheduleType = null,
+            status = null,
+            pageable = Pageable.unpaged(Sort.by(Sort.Direction.ASC, "startDt"))
+        ).content
     }
 
     @Transactional(readOnly = true)

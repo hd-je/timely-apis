@@ -37,4 +37,31 @@ interface ProjectRepository : JpaRepository<Project, Long> {
         @Param("keyword") keyword: String?,
         pageable: Pageable
     ): Page<Project>
+
+    @Query(
+        """
+        select distinct p
+        from Project p
+        left join ProjectMember m
+          on m.projectSn = p.projectSn
+         and m.userSn = :userSn
+         and m.useYn = 'Y'
+        where p.useYn = 'Y'
+          and p.companySn = :companySn
+          and (p.ownerUserSn = :userSn or m.projectMemberSn is not null)
+          and (:status is null or p.status = :status)
+          and (
+              :keyword is null
+              or lower(p.projectNm) like lower(concat('%', :keyword, '%'))
+              or lower(p.description) like lower(concat('%', :keyword, '%'))
+          )
+        """
+    )
+    fun searchAssignedProjects(
+        @Param("companySn") companySn: Long,
+        @Param("userSn") userSn: Long,
+        @Param("status") status: String?,
+        @Param("keyword") keyword: String?,
+        pageable: Pageable
+    ): Page<Project>
 }

@@ -97,6 +97,46 @@ class ProjectController(
         )
     )
 
+    @Operation(summary = "내 배정 프로젝트 목록 검색", description = "인증 사용자가 책임자이거나 참여자인 프로젝트를 조회한다.")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(responseCode = "400", description = "잘못된 상태 또는 검색 조건"),
+            ApiResponse(responseCode = "401", description = "인증 필요")
+        ]
+    )
+    @GetMapping("/assigned")
+    fun searchAssignedProjects(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @Parameter(description = "프로젝트 상태 코드", example = "IN_PROGRESS")
+        @RequestParam(required = false)
+        status: String?,
+        @Parameter(description = "프로젝트명 또는 설명 검색어", example = "리뉴얼")
+        @RequestParam(required = false)
+        keyword: String?,
+        @Parameter(description = "페이지 번호. 0부터 시작", example = "0")
+        @RequestParam(defaultValue = "0")
+        page: Int,
+        @Parameter(description = "페이지 크기", example = "20")
+        @RequestParam(defaultValue = "20")
+        size: Int,
+        @Parameter(description = "정렬", example = "createDt,desc")
+        @RequestParam(required = false)
+        sort: String?
+    ) = projectService.searchAssignedProjects(
+        companySn = principal.companySn,
+        userSn = principal.userSn,
+        status = status,
+        keyword = keyword,
+        pageable = PageableFactory.create(
+            page = page,
+            size = size,
+            sort = sort,
+            allowedProperties = setOf("projectSn", "projectNm", "status", "priority", "visibility", "progressRate", "startDt", "endDt", "budgetAmt", "clientNm", "createDt"),
+            defaultProperty = "projectSn"
+        )
+    )
+
     @Operation(summary = "프로젝트 상태별 카운트 조회", description = "전체, 진행중, 완료, 보류 프로젝트 수를 조회한다.")
     @ApiResponses(
         value = [

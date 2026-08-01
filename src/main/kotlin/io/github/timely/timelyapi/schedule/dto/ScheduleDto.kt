@@ -12,7 +12,7 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String? = null,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING")
+        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
         val scheduleType: String,
 
         @field:Schema(description = "일정 상태 코드", example = "PLANNED")
@@ -48,7 +48,7 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String? = null,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING")
+        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
         val scheduleType: String,
 
         @field:Schema(description = "일정 상태 코드", example = "IN_PROGRESS")
@@ -117,7 +117,7 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String?,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING")
+        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
         val scheduleType: String,
 
         @field:Schema(description = "일정 유형명", example = "회의")

@@ -111,6 +111,27 @@ class ProjectService(
     }
 
     @Transactional(readOnly = true)
+    fun searchAssignedProjects(
+        companySn: Long,
+        userSn: Long,
+        status: String?,
+        keyword: String?,
+        pageable: Pageable
+    ): PageResponse<ProjectDto.SimpleResponse> {
+        val normalizedStatus = status.normalized()
+        if (normalizedStatus != null) validateProjectStatus(normalizedStatus)
+        return PageResponse.from(
+            projectRepository.searchAssignedProjects(
+                companySn = companySn,
+                userSn = userSn,
+                status = normalizedStatus,
+                keyword = keyword.normalized(),
+                pageable = pageable
+            ).map { it.toSimpleResponse() }
+        )
+    }
+
+    @Transactional(readOnly = true)
     fun getStatusCounts(companySn: Long): ProjectDto.StatusCountsResponse {
         return ProjectDto.StatusCountsResponse(
             totalCount = projectRepository.countByCompanySnAndUseYn(companySn, "Y"),
