@@ -51,31 +51,16 @@ interface ScheduleRepository : JpaRepository<Schedule, Long> {
           and s.startDt <= :endDt
           and s.endDt >= :startDt
           and (:projectSn is null or s.projectSn = :projectSn)
-          and (:scheduleType is null or s.scheduleType = :scheduleType)
+          and s.scheduleType in :scheduleTypes
           and (:status is null or s.status = :status)
-          and (
-              exists (
-                  select 1
-                  from TimelyUser ownerUser
-                  where ownerUser.userSn = s.ownerUserSn
-                    and ownerUser.companySn = s.companySn
-                    and ownerUser.deptSn = :deptSn
-                    and ownerUser.userStatus = 'ACTIVE'
-                    and ownerUser.useYn = 'Y'
-              )
-              or exists (
-                  select 1
-                  from ScheduleParticipant p
-                  join TimelyUser participantUser
-                    on participantUser.userSn = p.userSn
-                   and participantUser.companySn = p.companySn
-                  where p.scheduleSn = s.scheduleSn
-                    and p.companySn = s.companySn
-                    and p.useYn = 'Y'
-                    and participantUser.deptSn = :deptSn
-                    and participantUser.userStatus = 'ACTIVE'
-                    and participantUser.useYn = 'Y'
-              )
+          and exists (
+              select 1
+              from TimelyUser ownerUser
+              where ownerUser.userSn = s.ownerUserSn
+                and ownerUser.companySn = s.companySn
+                and ownerUser.deptSn = :deptSn
+                and ownerUser.userStatus = 'ACTIVE'
+                and ownerUser.useYn = 'Y'
           )
         """
     )
@@ -85,7 +70,7 @@ interface ScheduleRepository : JpaRepository<Schedule, Long> {
         @Param("startDt") startDt: LocalDateTime,
         @Param("endDt") endDt: LocalDateTime,
         @Param("projectSn") projectSn: Long?,
-        @Param("scheduleType") scheduleType: String?,
+        @Param("scheduleTypes") scheduleTypes: Collection<String>,
         @Param("status") status: String?,
         pageable: Pageable
     ): Page<Schedule>

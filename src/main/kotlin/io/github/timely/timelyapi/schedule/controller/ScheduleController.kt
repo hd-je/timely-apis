@@ -40,7 +40,8 @@ class ScheduleController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201", description = "생성 성공"),
-            ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            ApiResponse(responseCode = "403", description = "인증 사용자와 다른 일정 소유자 지정")
         ]
     )
     @PostMapping
@@ -200,7 +201,26 @@ class ScheduleController(
         @AuthenticationPrincipal principal: TimelyPrincipal
     ) = scheduleService.searchUpcomingSchedules(principal.companySn, principal.userSn)
 
-    @Operation(summary = "팀 일정 목록 검색", description = "대상 부서 활성 사용자의 일정을 조회한다. 연차와 출장도 일정 유형으로 포함하며 from/to 사용 시 전체 반환한다.")
+    @Operation(
+        summary = "팀 예정 일정 조회",
+        description = "인증 사용자의 부서에서 오늘부터 7일 후 23:59:59까지 겹치는 연차와 출장 일정을 시작일시 오름차순으로 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(responseCode = "400", description = "사용자 또는 부서가 존재하지 않음"),
+            ApiResponse(responseCode = "401", description = "인증 필요")
+        ]
+    )
+    @GetMapping("/team/upcoming")
+    fun searchUpcomingTeamSchedules(
+        @AuthenticationPrincipal principal: TimelyPrincipal
+    ) = scheduleService.searchUpcomingTeamSchedules(principal.companySn, principal.userSn)
+
+    @Operation(
+        summary = "팀 일정 목록 검색",
+        description = "대상 부서 활성 사용자(본인 포함)의 연차와 출장 일정만 조회합니다. from/to 사용 시 전체 반환합니다."
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -237,7 +257,10 @@ class ScheduleController(
         @RequestParam(required = false)
         projectSn: Long?,
 
-        @Parameter(description = "일정 유형 코드", example = "MEETING")
+        @Parameter(
+            description = "팀 공개 일정 유형 코드. 생략하면 연차와 출장을 모두 조회합니다.",
+            example = "ANNUAL_LEAVE"
+        )
         @RequestParam(required = false)
         scheduleType: String?,
 
@@ -291,7 +314,8 @@ class ScheduleController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "수정 성공"),
-            ApiResponse(responseCode = "400", description = "잘못된 요청 또는 일정이 존재하지 않음")
+            ApiResponse(responseCode = "400", description = "잘못된 요청 또는 일정이 존재하지 않음"),
+            ApiResponse(responseCode = "403", description = "일정 소유자가 아님 또는 소유권 변경 시도")
         ]
     )
     @PutMapping("/{scheduleSn}")
@@ -301,13 +325,14 @@ class ScheduleController(
         @PathVariable
         scheduleSn: Long,
         @RequestBody request: ScheduleDto.UpdateRequest
-    ) = scheduleService.updateSchedule(principal.companySn, scheduleSn, request)
+    ) = scheduleService.updateSchedule(principal.companySn, principal.userSn, scheduleSn, request)
 
     @Operation(summary = "일정 상태 변경", description = "회사 범위 안의 활성 일정 상태만 변경한다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "상태 변경 성공"),
-            ApiResponse(responseCode = "400", description = "잘못된 상태 또는 일정이 존재하지 않음")
+            ApiResponse(responseCode = "400", description = "잘못된 상태 또는 일정이 존재하지 않음"),
+            ApiResponse(responseCode = "403", description = "일정 소유자가 아님")
         ]
     )
     @PatchMapping("/{scheduleSn}/status")
@@ -317,13 +342,14 @@ class ScheduleController(
         @PathVariable
         scheduleSn: Long,
         @RequestBody request: ScheduleDto.StatusRequest
-    ) = scheduleService.updateScheduleStatus(principal.companySn, scheduleSn, request)
+    ) = scheduleService.updateScheduleStatus(principal.companySn, principal.userSn, scheduleSn, request)
 
     @Operation(summary = "일정 삭제", description = "일정을 물리 삭제하지 않고 비활성화한다.")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "204", description = "삭제 성공"),
-            ApiResponse(responseCode = "400", description = "일정이 존재하지 않음")
+            ApiResponse(responseCode = "400", description = "일정이 존재하지 않음"),
+            ApiResponse(responseCode = "403", description = "일정 소유자가 아님")
         ]
     )
     @DeleteMapping("/{scheduleSn}")
@@ -334,7 +360,7 @@ class ScheduleController(
         @PathVariable
         scheduleSn: Long
     ) {
-        scheduleService.deleteSchedule(principal.companySn, scheduleSn)
+        scheduleService.deleteSchedule(principal.companySn, principal.userSn, scheduleSn)
     }
 
     private fun resolveRange(

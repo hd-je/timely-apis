@@ -13,8 +13,10 @@ import io.github.timely.timelyapi.user.model.TimelyUser
 import io.github.timely.timelyapi.user.repository.UserRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -37,10 +39,14 @@ class ScheduleService(
         request: ScheduleDto.CreateRequest
     ): ScheduleDto.Response {
         val ownerUserSn = request.ownerUserSn ?: userSn
+        if (ownerUserSn != userSn) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Schedule owner must be the authenticated user")
+        }
+        val scheduleType = normalizeScheduleType(request.scheduleType)
         validateScheduleValues(
             companySn = companySn,
             title = request.title,
-            scheduleType = request.scheduleType,
+            scheduleType = scheduleType,
             status = request.status,
             startDt = request.startDt,
             endDt = request.endDt,
@@ -57,7 +63,7 @@ class ScheduleService(
                 ownerUserSn = ownerUserSn,
                 title = request.title.trim(),
                 content = request.content.normalized(),
-                scheduleType = request.scheduleType.trim(),
+                scheduleType = scheduleType,
                 status = request.status.trim(),
                 startDt = request.startDt,
                 endDt = request.endDt,
@@ -84,7 +90,8 @@ class ScheduleService(
         require(!startDt.isAfter(endDt)) { "Start date-time must be before or equal to end date-time" }
         if (projectSn != null) validateActiveProject(companySn, projectSn)
         if (userSn != null) validateActiveUser(companySn, userSn, "Schedule user not found")
-        scheduleType?.trim()?.takeIf { it.isNotBlank() }
+        val normalizedScheduleType = scheduleType?.let(::normalizeScheduleType)
+        normalizedScheduleType?.takeIf { it.isNotBlank() }
             ?.let { validateCommonCode("SCHEDULE_TYPE", it, "Invalid schedule type") }
         status?.trim()?.takeIf { it.isNotBlank() }
             ?.let { validateCommonCode("SCHEDULE_STATUS", it, "Invalid schedule status") }
@@ -95,7 +102,7 @@ class ScheduleService(
             endDt = endDt,
             projectSn = projectSn,
             userSn = userSn,
-            scheduleType = scheduleType.normalized(),
+            scheduleType = normalizedScheduleType,
             status = status.normalized(),
             pageable = pageable
         )
@@ -145,6 +152,22 @@ class ScheduleService(
     }
 
     @Transactional(readOnly = true)
+    fun searchUpcomingTeamSchedules(companySn: Long, userSn: Long): List<ScheduleDto.Response> {
+        val today = LocalDate.now(SEOUL_ZONE_ID)
+        return searchTeamSchedules(
+            companySn = companySn,
+            userSn = userSn,
+            deptSn = null,
+            startDt = today.atStartOfDay(),
+            endDt = today.plusDays(7).atTime(LocalTime.MAX),
+            projectSn = null,
+            scheduleType = null,
+            status = null,
+            pageable = Pageable.unpaged(Sort.by(Sort.Direction.ASC, "startDt"))
+        ).content
+    }
+
+    @Transactional(readOnly = true)
     fun searchTeamSchedules(
         companySn: Long,
         userSn: Long,
@@ -158,8 +181,14 @@ class ScheduleService(
     ): PageResponse<ScheduleDto.Response> {
         require(!startDt.isAfter(endDt)) { "Start date-time must be before or equal to end date-time" }
         if (projectSn != null) validateActiveProject(companySn, projectSn)
-        scheduleType?.trim()?.takeIf { it.isNotBlank() }
-            ?.let { validateCommonCode("SCHEDULE_TYPE", it, "Invalid schedule type") }
+        val normalizedScheduleType = scheduleType?.let(::normalizeScheduleType)
+        normalizedScheduleType?.takeIf { it.isNotBlank() }
+            ?.let {
+                validateCommonCode("SCHEDULE_TYPE", it, "Invalid schedule type")
+                require(it in TEAM_SCHEDULE_TYPES) {
+                    "Team schedules only support ANNUAL_LEAVE and BUSINESS_TRIP types"
+                }
+            }
         status?.trim()?.takeIf { it.isNotBlank() }
             ?.let { validateCommonCode("SCHEDULE_STATUS", it, "Invalid schedule status") }
 
@@ -172,7 +201,7 @@ class ScheduleService(
             startDt = startDt,
             endDt = endDt,
             projectSn = projectSn,
-            scheduleType = scheduleType.normalized(),
+            scheduleTypes = normalizedScheduleType?.let(::listOf) ?: TEAM_SCHEDULE_TYPES,
             status = status.normalized(),
             pageable = pageable
         )
@@ -189,13 +218,19 @@ class ScheduleService(
     @Transactional
     fun updateSchedule(
         companySn: Long,
+        userSn: Long,
         scheduleSn: Long,
         request: ScheduleDto.UpdateRequest
     ): ScheduleDto.Response {
+        val schedule = getOwnedSchedule(companySn, userSn, scheduleSn)
+        if (request.ownerUserSn != schedule.ownerUserSn) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Schedule owner cannot be changed")
+        }
+        val scheduleType = normalizeScheduleType(request.scheduleType)
         validateScheduleValues(
             companySn = companySn,
             title = request.title,
-            scheduleType = request.scheduleType,
+            scheduleType = scheduleType,
             status = request.status,
             startDt = request.startDt,
             endDt = request.endDt,
@@ -205,12 +240,10 @@ class ScheduleService(
             participantUserSns = request.participantUserSns
         )
 
-        val schedule = getActiveSchedule(companySn, scheduleSn)
         schedule.projectSn = request.projectSn
-        schedule.ownerUserSn = request.ownerUserSn
         schedule.title = request.title.trim()
         schedule.content = request.content.normalized()
-        schedule.scheduleType = request.scheduleType.trim()
+        schedule.scheduleType = scheduleType
         schedule.status = request.status.trim()
         schedule.startDt = request.startDt
         schedule.endDt = request.endDt
@@ -222,20 +255,25 @@ class ScheduleService(
     }
 
     @Transactional
-    fun updateScheduleStatus(companySn: Long, scheduleSn: Long, request: ScheduleDto.StatusRequest): ScheduleDto.Response {
+    fun updateScheduleStatus(
+        companySn: Long,
+        userSn: Long,
+        scheduleSn: Long,
+        request: ScheduleDto.StatusRequest
+    ): ScheduleDto.Response {
+        val schedule = getOwnedSchedule(companySn, userSn, scheduleSn)
         val status = request.status.trim()
         require(status.isNotBlank()) { "Schedule status must not be blank" }
         validateCommonCode("SCHEDULE_STATUS", status, "Invalid schedule status")
 
-        val schedule = getActiveSchedule(companySn, scheduleSn)
         schedule.status = status
 
         return schedule.toResponse()
     }
 
     @Transactional
-    fun deleteSchedule(companySn: Long, scheduleSn: Long) {
-        getActiveSchedule(companySn, scheduleSn).useYn = "N"
+    fun deleteSchedule(companySn: Long, userSn: Long, scheduleSn: Long) {
+        getOwnedSchedule(companySn, userSn, scheduleSn).useYn = "N"
         scheduleParticipantRepository.findByScheduleSnAndUseYnOrderByScheduleParticipantSnAsc(scheduleSn, "Y")
             .forEach { it.useYn = "N" }
     }
@@ -295,6 +333,19 @@ class ScheduleService(
         require(commonCodeRepository.existsByCodeGroupAndCodeAndUseYn(codeGroup, code, "Y")) { message }
     }
 
+    private fun getOwnedSchedule(companySn: Long, userSn: Long, scheduleSn: Long): Schedule {
+        val schedule = getActiveSchedule(companySn, scheduleSn)
+        if (schedule.ownerUserSn != userSn) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Only the schedule owner can modify this schedule")
+        }
+        return schedule
+    }
+
+    private fun normalizeScheduleType(scheduleType: String): String {
+        val normalized = scheduleType.trim()
+        return if (normalized.equals("WORK", ignoreCase = true)) "TASK" else normalized
+    }
+
     private fun replaceParticipants(companySn: Long, scheduleSn: Long, participantUserSns: List<Long>) {
         val existingParticipants = scheduleParticipantRepository.findByScheduleSnOrderByScheduleParticipantSnAsc(scheduleSn)
         existingParticipants.forEach { it.useYn = "N" }
@@ -324,6 +375,11 @@ class ScheduleService(
     }
 
     private fun String?.normalized() = this?.trim()?.takeIf { it.isNotBlank() }
+
+    companion object {
+        private val SEOUL_ZONE_ID: ZoneId = ZoneId.of("Asia/Seoul")
+        private val TEAM_SCHEDULE_TYPES = listOf("ANNUAL_LEAVE", "BUSINESS_TRIP")
+    }
 
     private fun Schedule.toResponse(
         participants: List<ScheduleParticipant> = scheduleParticipantRepository

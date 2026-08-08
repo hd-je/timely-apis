@@ -12,7 +12,11 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String? = null,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
+        @field:Schema(
+            description = "일정 유형 코드. WORK/work는 TASK의 입력 호환 별칭이며 TASK로 저장되고 응답됩니다.",
+            example = "MEETING",
+            allowableValues = ["MEETING", "TASK", "WORK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"]
+        )
         val scheduleType: String,
 
         @field:Schema(description = "일정 상태 코드", example = "PLANNED")
@@ -27,7 +31,10 @@ class ScheduleDto {
         @field:Schema(description = "종일 여부", example = "N")
         val allDayYn: String = "N",
 
-        @field:Schema(description = "소유자 사용자 일련번호. 미입력 시 인증 사용자로 저장", example = "1")
+        @field:Schema(
+            description = "소유자 사용자 일련번호. 미입력 시 인증 사용자로 저장하며 다른 사용자는 지정할 수 없습니다.",
+            example = "1"
+        )
         val ownerUserSn: Long? = null,
 
         @field:Schema(description = "연결 프로젝트 일련번호", example = "10")
@@ -48,7 +55,11 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String? = null,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
+        @field:Schema(
+            description = "일정 유형 코드. WORK/work는 TASK의 입력 호환 별칭이며 TASK로 저장되고 응답됩니다.",
+            example = "MEETING",
+            allowableValues = ["MEETING", "TASK", "WORK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"]
+        )
         val scheduleType: String,
 
         @field:Schema(description = "일정 상태 코드", example = "IN_PROGRESS")
@@ -63,7 +74,7 @@ class ScheduleDto {
         @field:Schema(description = "종일 여부", example = "N")
         val allDayYn: String = "N",
 
-        @field:Schema(description = "소유자 사용자 일련번호", example = "1")
+        @field:Schema(description = "소유자 사용자 일련번호. 기존 소유자와 같아야 하며 수정할 수 없습니다.", example = "1")
         val ownerUserSn: Long,
 
         @field:Schema(description = "연결 프로젝트 일련번호", example = "10")
@@ -117,7 +128,11 @@ class ScheduleDto {
         @field:Schema(description = "일정 내용", example = "프로젝트 범위와 역할을 확정합니다.")
         val content: String?,
 
-        @field:Schema(description = "일정 유형 코드", example = "MEETING", allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"])
+        @field:Schema(
+            description = "정규 일정 유형 코드. WORK 입력은 TASK로 정규화되어 응답됩니다.",
+            example = "MEETING",
+            allowableValues = ["MEETING", "TASK", "PERSONAL", "REMINDER", "ANNUAL_LEAVE", "BUSINESS_TRIP"]
+        )
         val scheduleType: String,
 
         @field:Schema(description = "일정 유형명", example = "회의")

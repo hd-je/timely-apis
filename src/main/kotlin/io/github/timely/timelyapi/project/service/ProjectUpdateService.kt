@@ -8,6 +8,7 @@ import io.github.timely.timelyapi.project.repository.ProjectTaskRepository
 import io.github.timely.timelyapi.project.repository.ProjectUpdateCommentRepository
 import io.github.timely.timelyapi.project.repository.ProjectUpdateRepository
 import io.github.timely.timelyapi.user.repository.UserRepository
+import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +19,8 @@ class ProjectUpdateService(
     private val projectUpdateRepository: ProjectUpdateRepository,
     private val projectUpdateCommentRepository: ProjectUpdateCommentRepository,
     private val commonCodeRepository: CommonCodeRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val entityManager: EntityManager
 ) {
 
     @Transactional
@@ -103,13 +105,16 @@ class ProjectUpdateService(
         getActiveUpdate(projectSn, projectUpdateSn)
         validateCommentContent(request.content)
 
-        return projectUpdateCommentRepository.save(
+        val comment = projectUpdateCommentRepository.save(
             ProjectUpdateComment(
                 projectUpdateSn = projectUpdateSn,
                 authorUserSn = userSn,
                 content = request.content.trim()
             )
-        ).toResponse()
+        )
+        refreshComment(comment)
+
+        return comment.toResponse()
     }
 
     @Transactional(readOnly = true)
@@ -142,6 +147,7 @@ class ProjectUpdateService(
         val comment = getActiveComment(projectUpdateSn, projectUpdateCommentSn)
         validateAuthor(comment.authorUserSn, userSn, "Only the comment author can modify this project update comment")
         comment.content = request.content.trim()
+        refreshComment(comment)
 
         return comment.toResponse()
     }
@@ -192,6 +198,11 @@ class ProjectUpdateService(
 
     private fun validateAuthor(authorUserSn: Long, userSn: Long, message: String) {
         require(authorUserSn == userSn) { message }
+    }
+
+    private fun refreshComment(comment: ProjectUpdateComment) {
+        entityManager.flush()
+        entityManager.refresh(comment)
     }
 
     private fun validateCommonCode(codeGroup: String, code: String, message: String) {
