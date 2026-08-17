@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -14,6 +15,16 @@ import org.springframework.web.filter.OncePerRequestFilter
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider
 ) : OncePerRequestFilter() {
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        if (HttpMethod.OPTIONS.matches(request.method)) {
+            return true
+        }
+
+        val path = request.requestURI.removeSuffix("/")
+        return request.method.equals(HttpMethod.POST.name(), ignoreCase = true) &&
+            path in PUBLIC_AUTH_PATHS
+    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -48,6 +59,7 @@ class JwtAuthenticationFilter(
 
     private companion object {
         const val BEARER_PREFIX = "Bearer "
+        val PUBLIC_AUTH_PATHS = setOf("/v1/auth/signup", "/v1/auth/login")
         val diagnosticLogger = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
     }
 }

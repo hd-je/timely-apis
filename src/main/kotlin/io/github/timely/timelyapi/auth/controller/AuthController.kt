@@ -25,12 +25,12 @@ class AuthController(
 
     @Operation(summary = "Signup")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/signup")
+    @PostMapping("/signup", "/signup/")
     fun signup(@RequestBody request: AuthDto.SignupRequest) =
         authService.signup(request)
 
     @Operation(summary = "Login")
-    @PostMapping("/login")
+    @PostMapping("/login", "/login/")
     fun login(@RequestBody request: AuthDto.LoginRequest) =
         authService.login(request)
 

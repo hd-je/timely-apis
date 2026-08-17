@@ -28,13 +28,18 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.GET, "/v1/departments", "/v1/departments/*").permitAll()
                     .requestMatchers(HttpMethod.GET, "/v1/positions", "/v1/positions/*").permitAll()
                     .requestMatchers(
-                    "/v1/auth/signup",
-                    "/v1/auth/login",
-                    "/v1/common-codes",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/v3/api-docs/**"
-                ).permitAll()
+                        HttpMethod.POST,
+                        "/v1/auth/signup",
+                        "/v1/auth/signup/",
+                        "/v1/auth/login",
+                        "/v1/auth/login/"
+                    ).permitAll()
+                    .requestMatchers(
+                        "/v1/common-codes",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
