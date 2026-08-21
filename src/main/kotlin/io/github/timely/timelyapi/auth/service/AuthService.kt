@@ -64,6 +64,7 @@ class AuthService(
                 companySn = request.companySn,
                 deptSn = request.deptSn,
                 email = email,
+                loginId = email,
                 passwordHash = passwordEncoder.encode(request.password),
                 userNm = userName,
                 position = position,

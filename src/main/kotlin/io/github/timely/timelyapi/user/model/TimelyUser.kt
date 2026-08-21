@@ -31,6 +31,9 @@ class TimelyUser(
     @Column(name = "email", nullable = false)
     var email: String,
 
+    @Column(name = "login_id", nullable = false)
+    var loginId: String,
+
     @Column(name = "password", nullable = false)
     var passwordHash: String,
 
