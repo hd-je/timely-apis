@@ -144,10 +144,10 @@ class ScheduleDto {
         @field:Schema(description = "일정 상태명", example = "예정")
         val statusNm: String?,
 
-        @field:Schema(description = "시작일시", example = "2026-07-01T09:00:00")
+        @field:Schema(description = "시작일시 (Asia/Seoul)", example = "2026-07-01T09:00:00+09:00")
         val startDt: LocalDateTime,
 
-        @field:Schema(description = "종료일시", example = "2026-07-01T10:00:00")
+        @field:Schema(description = "종료일시 (Asia/Seoul)", example = "2026-07-01T10:00:00+09:00")
         val endDt: LocalDateTime,
 
         @field:Schema(description = "종일 여부", example = "N")
@@ -159,10 +159,10 @@ class ScheduleDto {
         @field:Schema(description = "참석자 목록")
         val participants: List<ParticipantResponse>,
 
-        @field:Schema(description = "생성일시", example = "2026-06-28T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-28T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-28T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-28T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

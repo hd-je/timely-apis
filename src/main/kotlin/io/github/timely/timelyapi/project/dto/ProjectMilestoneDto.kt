@@ -76,10 +76,10 @@ class ProjectMilestoneDto {
         @field:Schema(description = "정렬 순서", example = "10")
         val sortSeq: Int,
 
-        @field:Schema(description = "생성일시", example = "2026-06-28T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-28T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-28T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-28T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

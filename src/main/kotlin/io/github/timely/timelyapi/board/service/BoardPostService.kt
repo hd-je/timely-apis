@@ -121,6 +121,16 @@ class BoardPostService(
     fun getSidebar(userSn: Long, companySn: Long, recentNoticeSize: Int, recentBookmarkSize: Int): BoardPostDto.SidebarResponse {
         val categoryNames = getCodeNameMap("BOARD_CATEGORY")
         val bookmarkCount = boardPostBookmarkRepository.countActiveBookmarks(userSn, companySn)
+        val myActivity = boardPostRepository.findUserActivity(userSn, companySn)
+        val activeUsers = boardPostRepository.findActiveUserActivities(companySn, PageRequest.of(0, 5)).map {
+            BoardPostDto.ActiveUserResponse(
+                userSn = it.userSn,
+                userName = it.userName,
+                avatarUrl = it.avatarUrl,
+                postCount = it.postCount,
+                commentCount = it.commentCount
+            )
+        }
         val recentBookmarks = boardPostBookmarkRepository.findRecentActiveBookmarks(
             userSn = userSn,
             companySn = companySn,
@@ -135,7 +145,12 @@ class BoardPostService(
                 recentPosts = recentBookmarks
             ),
             authoredPosts = BoardPostDto.AuthoredPostSummaryResponse(
-                count = boardPostRepository.countByCompanySnAndAuthorUserSnAndUseYn(companySn, userSn, "Y")
+                count = myActivity.postCount
+            ),
+            activeUsers = activeUsers,
+            myActivity = BoardPostDto.MyActivityResponse(
+                postCount = myActivity.postCount,
+                commentCount = myActivity.commentCount
             )
         )
     }

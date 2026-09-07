@@ -2,6 +2,7 @@ package io.github.timely.timelyapi.board.controller
 
 import io.github.timely.timelyapi.board.dto.BoardPostDto
 import io.github.timely.timelyapi.board.service.BoardPostService
+import io.github.timely.timelyapi.board.service.BoardPostAttachmentService
 import io.github.timely.timelyapi.auth.jwt.TimelyPrincipal
 import io.github.timely.timelyapi.common.PageableFactory
 import io.swagger.v3.oas.annotations.Operation
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -18,16 +20,28 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "Board Post", description = "게시글 API")
 @RestController
 @RequestMapping("/v1/board-posts")
 class BoardPostController(
-    private val boardPostService: BoardPostService
+    private val boardPostService: BoardPostService,
+    private val boardPostAttachmentService: BoardPostAttachmentService
 ) {
+
+    @Operation(summary = "게시글 첨부파일 업로드", description = "게시글 작성자가 최대 3MB 파일을 첨부한다.")
+    @PostMapping("/{boardPostSn}/files", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @ResponseStatus(HttpStatus.CREATED)
+    fun uploadFile(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @PathVariable boardPostSn: Long,
+        @RequestPart("file") file: MultipartFile
+    ) = boardPostAttachmentService.upload(principal.userSn, principal.companySn, boardPostSn, file)
 
     @Operation(summary = "게시글 생성", description = "게시글을 생성한다. 카테고리와 상태는 활성 공통코드여야 한다.")
     @ApiResponses(

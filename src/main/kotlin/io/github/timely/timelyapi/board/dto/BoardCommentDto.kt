@@ -48,10 +48,10 @@ class BoardCommentDto {
         @field:Schema(description = "현재 사용자의 좋아요 여부", example = "true")
         val likedByMe: Boolean,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:30:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:30:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-17T10:30:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-17T10:30:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

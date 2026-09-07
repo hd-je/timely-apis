@@ -118,13 +118,13 @@ class ProjectTaskDto {
         @field:Schema(description = "마감일", example = "2026-06-30")
         val dueDt: LocalDate?,
 
-        @field:Schema(description = "완료일시", example = "2026-06-27T10:30:00")
+        @field:Schema(description = "완료일시 (Asia/Seoul)", example = "2026-06-27T10:30:00+09:00")
         val completeDt: LocalDateTime?,
 
-        @field:Schema(description = "생성일시", example = "2026-06-27T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-27T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-27T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-27T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

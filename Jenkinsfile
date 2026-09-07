@@ -9,6 +9,8 @@ pipeline {
         CONTAINER_PORT = '8080'
         DB_URL = 'jdbc:mysql://mysql:3306/devdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true'
         DB_USER = 'dev'
+        FILE_STORAGE_ROOT = '/app/uploads'
+        FILE_STORAGE_VOLUME = 'timely-api-uploads'
     }
 
     stages {

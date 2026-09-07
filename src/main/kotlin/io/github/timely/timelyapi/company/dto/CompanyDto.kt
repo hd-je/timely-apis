@@ -15,10 +15,10 @@ class CompanyDto {
         @field:Schema(description = "사용 여부. Y: 사용, N: 미사용", example = "Y")
         val useYn: String,
 
-        @field:Schema(description = "생성일시", example = "2026-05-04T16:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-04T16:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-04T16:30:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-04T16:30:00+09:00")
         val updateDt: LocalDateTime?
     )
 

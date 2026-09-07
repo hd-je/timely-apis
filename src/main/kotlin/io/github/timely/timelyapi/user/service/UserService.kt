@@ -1,15 +1,81 @@
 package io.github.timely.timelyapi.user.service
 
+import io.github.timely.timelyapi.department.repository.DepartmentRepository
+import io.github.timely.timelyapi.position.repository.PositionRepository
 import io.github.timely.timelyapi.user.dto.UserDto
 import io.github.timely.timelyapi.user.model.TimelyUser
 import io.github.timely.timelyapi.user.repository.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val departmentRepository: DepartmentRepository,
+    private val positionRepository: PositionRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
+
+    @Transactional
+    fun updateMyProfile(
+        userSn: Long,
+        companySn: Long,
+        request: UserDto.ProfileUpdateRequest
+    ): UserDto.Response {
+        val user = getActiveCompanyUser(userSn, companySn)
+
+        request.userNm?.let {
+            val userName = it.trim()
+            require(userName.isNotBlank()) { "Name is required" }
+            user.userNm = userName
+        }
+
+        request.deptSn?.let { deptSn ->
+            departmentRepository.findByDeptSnAndCompanySnAndUseYn(deptSn, companySn, "Y")
+                ?: throw IllegalArgumentException("Department is not active or does not belong to the company")
+            user.deptSn = deptSn
+        }
+
+        request.position?.let {
+            val position = it.trim()
+            require(position.isNotBlank()) { "Invalid position" }
+            require(positionRepository.existsByCompanySnAndPositionCdAndUseYn(companySn, position, "Y")) {
+                "Invalid position"
+            }
+            user.position = position
+        }
+
+        request.phoneNo?.let {
+            val phoneNo = it.trim()
+            require(phoneNo.isNotBlank()) { "Phone number is required" }
+            user.phoneNo = phoneNo
+        }
+
+        return user.toResponse()
+    }
+
+    @Transactional
+    fun updateMyPassword(
+        userSn: Long,
+        companySn: Long,
+        request: UserDto.PasswordUpdateRequest
+    ): UserDto.PasswordUpdateResponse {
+        val user = getActiveCompanyUser(userSn, companySn)
+
+        require(passwordEncoder.matches(request.currentPassword, user.passwordHash)) {
+            "Current password does not match"
+        }
+        require(request.newPassword.matches(PASSWORD_PATTERN)) {
+            "Password must be at least 8 characters and include letters, numbers, and special characters"
+        }
+        require(request.newPassword == request.newPasswordConfirm) {
+            "Password confirmation does not match"
+        }
+
+        user.passwordHash = passwordEncoder.encode(request.newPassword)
+        return UserDto.PasswordUpdateResponse(message = "Password updated")
+    }
 
     @Transactional(readOnly = true)
     fun getUser(userSn: Long): UserDto.Response {
@@ -43,6 +109,10 @@ class UserService(
         )
     }
 
+    private fun getActiveCompanyUser(userSn: Long, companySn: Long): TimelyUser =
+        userRepository.findByUserSnAndCompanySnAndUseYn(userSn, companySn, "Y")
+            ?: throw IllegalArgumentException("User not found")
+
     private fun TimelyUser.toSimpleResponse() =
         UserDto.SimpleResponse(
             userSn = userSn!!,
@@ -70,4 +140,8 @@ class UserService(
             createDt = createDt,
             updateDt = updateDt
         )
+
+    companion object {
+        private val PASSWORD_PATTERN = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")
+    }
 }

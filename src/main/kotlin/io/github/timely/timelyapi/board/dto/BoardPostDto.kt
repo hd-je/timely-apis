@@ -78,10 +78,10 @@ class BoardPostDto {
         @field:Schema(description = "현재 사용자의 북마크 여부", example = "true")
         val bookmarkedByMe: Boolean,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-17T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-17T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -132,10 +132,10 @@ class BoardPostDto {
         @field:Schema(description = "사용 여부. Y: 사용, N: 미사용", example = "Y")
         val useYn: String,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-17T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-17T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -159,7 +159,7 @@ class BoardPostDto {
         @field:Schema(description = "제목", example = "2024년 1분기 프로젝트 계획 공지")
         val title: String,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?
     )
 
@@ -175,7 +175,13 @@ class BoardPostDto {
         val bookmarks: BookmarkSummaryResponse,
 
         @field:Schema(description = "현재 사용자 작성 게시글 요약")
-        val authoredPosts: AuthoredPostSummaryResponse
+        val authoredPosts: AuthoredPostSummaryResponse,
+
+        @field:Schema(description = "회사 내 활발한 사용자 상위 5명")
+        val activeUsers: List<ActiveUserResponse>,
+
+        @field:Schema(description = "현재 사용자의 게시판 활동")
+        val myActivity: MyActivityResponse
     )
 
     @Schema(name = "BoardPostBookmarkSummaryResponse", description = "현재 사용자 북마크 요약 응답")
@@ -201,10 +207,10 @@ class BoardPostDto {
         @field:Schema(description = "제목", example = "주간 회의 안내")
         val title: String,
 
-        @field:Schema(description = "게시글 생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "게시글 생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "북마크 생성일시", example = "2026-05-17T10:00:00")
+        @field:Schema(description = "북마크 생성일시 (Asia/Seoul)", example = "2026-05-17T10:00:00+09:00")
         val bookmarkedDt: LocalDateTime?
     )
 
@@ -212,5 +218,32 @@ class BoardPostDto {
     data class AuthoredPostSummaryResponse(
         @field:Schema(description = "현재 사용자가 작성한 활성 게시글 수", example = "5")
         val count: Long
+    )
+
+    @Schema(name = "BoardPostActiveUserResponse", description = "게시판 활발한 사용자 응답")
+    data class ActiveUserResponse(
+        @field:Schema(description = "사용자 일련번호", example = "1")
+        val userSn: Long,
+
+        @field:Schema(description = "사용자명", example = "김민수")
+        val userName: String,
+
+        @field:Schema(description = "프로필 이미지 URL", example = "/files/avatars/1.png")
+        val avatarUrl: String?,
+
+        @field:Schema(description = "작성한 활성 게시글 수", example = "12")
+        val postCount: Long,
+
+        @field:Schema(description = "작성한 활성 댓글 수", example = "24")
+        val commentCount: Long
+    )
+
+    @Schema(name = "BoardPostMyActivityResponse", description = "현재 사용자 게시판 활동 응답")
+    data class MyActivityResponse(
+        @field:Schema(description = "작성한 활성 게시글 수", example = "5")
+        val postCount: Long,
+
+        @field:Schema(description = "작성한 활성 댓글 수", example = "8")
+        val commentCount: Long
     )
 }

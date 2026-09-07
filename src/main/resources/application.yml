@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
   jpa:
     hibernate:
       ddl-auto: validate   # ?? ?? update / ??? validate ??
@@ -24,3 +28,7 @@ logging:
 jwt:
   secret: ${JWT_SECRET:change-this-secret-key-to-at-least-32-bytes}
   access-token-expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:3600000}
+
+timely:
+  file:
+    storage-root: ${FILE_STORAGE_ROOT:./uploads}

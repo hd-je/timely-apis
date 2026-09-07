@@ -3,12 +3,14 @@ package io.github.timely.timelyapi.project.controller
 import io.github.timely.timelyapi.auth.jwt.TimelyPrincipal
 import io.github.timely.timelyapi.project.dto.ProjectUpdateDto
 import io.github.timely.timelyapi.project.service.ProjectUpdateService
+import io.github.timely.timelyapi.project.service.ProjectUpdateAttachmentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,15 +19,34 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "Project Update", description = "프로젝트 업데이트 피드 API")
 @RestController
 @RequestMapping("/v1/projects/{projectSn}/updates")
 class ProjectUpdateController(
-    private val projectUpdateService: ProjectUpdateService
+    private val projectUpdateService: ProjectUpdateService,
+    private val projectUpdateAttachmentService: ProjectUpdateAttachmentService
 ) {
+
+    @Operation(summary = "프로젝트 업데이트 첨부파일 업로드", description = "업데이트 작성자가 최대 3MB 파일을 첨부한다.")
+    @PostMapping("/{projectUpdateSn}/files", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @ResponseStatus(HttpStatus.CREATED)
+    fun uploadFile(
+        @AuthenticationPrincipal principal: TimelyPrincipal,
+        @PathVariable projectSn: Long,
+        @PathVariable projectUpdateSn: Long,
+        @RequestPart("file") file: MultipartFile
+    ) = projectUpdateAttachmentService.upload(
+        principal.userSn,
+        principal.companySn,
+        projectSn,
+        projectUpdateSn,
+        file
+    )
 
     @Operation(summary = "프로젝트 업데이트 작성", description = "프로젝트 상세의 진행 상황 및 업데이트 피드에 수동 업데이트를 작성한다.")
     @ApiResponses(

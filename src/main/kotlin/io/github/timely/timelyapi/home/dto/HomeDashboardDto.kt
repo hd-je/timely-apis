@@ -1,5 +1,7 @@
 package io.github.timely.timelyapi.home.dto
 
+import io.github.timely.timelyapi.project.dto.ProjectDto
+import io.github.timely.timelyapi.schedule.dto.ScheduleDto
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
@@ -10,7 +12,55 @@ class HomeDashboardDto {
         val projects: ProjectSummaryResponse,
 
         @field:Schema(description = "게시판 요약")
-        val boards: BoardSummaryResponse
+        val boards: BoardSummaryResponse,
+
+        @field:Schema(description = "현재 사용자에게 배정된 프로젝트 요약")
+        val assignedProjects: AssignedProjectSummaryResponse,
+
+        @field:Schema(description = "오늘부터 7일 이내의 내 일정")
+        val upcomingSchedules: List<ScheduleDto.Response>,
+
+        @field:Schema(description = "게시글과 배정 프로젝트 업데이트를 합친 최근 활동")
+        val recentActivities: List<RecentActivityResponse>
+    )
+
+    @Schema(name = "HomeAssignedProjectSummaryResponse", description = "나에게 배정된 프로젝트 요약")
+    data class AssignedProjectSummaryResponse(
+        @field:Schema(description = "나에게 배정된 활성 프로젝트 전체 건수", example = "4")
+        val totalCount: Long,
+
+        @field:Schema(description = "나에게 배정된 프로젝트 목록")
+        val projects: List<ProjectDto.SimpleResponse>
+    )
+
+    @Schema(name = "HomeRecentActivityResponse", description = "홈 최근 활동")
+    data class RecentActivityResponse(
+        @field:Schema(description = "활동 유형", example = "BOARD_POST", allowableValues = ["BOARD_POST", "PROJECT_UPDATE"])
+        val activityType: String,
+
+        @field:Schema(description = "활동 대상 일련번호", example = "10")
+        val targetSn: Long,
+
+        @field:Schema(description = "연결 프로젝트 일련번호. 게시글은 null", example = "3")
+        val projectSn: Long?,
+
+        @field:Schema(description = "연결 프로젝트명. 게시글은 null", example = "웹사이트 리뉴얼")
+        val projectNm: String?,
+
+        @field:Schema(description = "작성자 사용자 일련번호", example = "1")
+        val authorUserSn: Long,
+
+        @field:Schema(description = "작성자명", example = "김민수")
+        val authorName: String?,
+
+        @field:Schema(description = "활동 제목", example = "주간 진행 상황")
+        val title: String,
+
+        @field:Schema(description = "활동 내용")
+        val content: String?,
+
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-08-28T18:07:00+09:00")
+        val createDt: LocalDateTime?
     )
 
     @Schema(name = "HomeProjectSummaryResponse", description = "홈 프로젝트 요약 응답")
@@ -63,7 +113,7 @@ class HomeDashboardDto {
         @field:Schema(description = "제목", example = "2026년 1분기 프로젝트 계획 공지")
         val title: String,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?
     )
 }

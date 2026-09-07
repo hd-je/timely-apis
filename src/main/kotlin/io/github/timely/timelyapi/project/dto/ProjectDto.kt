@@ -182,10 +182,10 @@ class ProjectDto {
         @field:Schema(description = "예외 조회 건수", example = "2")
         val accessExceptionCount: Long,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-17T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-17T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -251,10 +251,10 @@ class ProjectDto {
         @field:Schema(description = "사용 여부. Y: 사용, N: 미사용", example = "Y")
         val useYn: String,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-05-17T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-05-17T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -392,7 +392,7 @@ class ProjectDto {
         @field:Schema(description = "콘텐츠 타입", example = "application/pdf")
         val contentType: String?,
 
-        @field:Schema(description = "생성일시", example = "2026-05-17T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-05-17T09:00:00+09:00")
         val createDt: LocalDateTime?
     )
 

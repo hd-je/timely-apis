@@ -84,10 +84,10 @@ class ProjectUpdateDto {
         @field:Schema(description = "댓글 수", example = "2")
         val commentCount: Long,
 
-        @field:Schema(description = "생성일시", example = "2026-06-27T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-27T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-27T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-27T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -129,10 +129,10 @@ class ProjectUpdateDto {
         @field:Schema(description = "댓글 목록")
         val comments: List<CommentResponse>,
 
-        @field:Schema(description = "생성일시", example = "2026-06-27T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-27T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-27T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-27T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 
@@ -153,10 +153,10 @@ class ProjectUpdateDto {
         @field:Schema(description = "댓글 내용", example = "확인했습니다.")
         val content: String,
 
-        @field:Schema(description = "생성일시", example = "2026-06-27T09:00:00")
+        @field:Schema(description = "생성일시 (Asia/Seoul)", example = "2026-06-27T09:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "수정일시", example = "2026-06-27T10:00:00")
+        @field:Schema(description = "수정일시 (Asia/Seoul)", example = "2026-06-27T10:00:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "Home Dashboard", description = "홈 대시보드 API")
@@ -30,6 +31,17 @@ class HomeDashboardController(
     fun getDashboard(
         @Parameter(hidden = true)
         @AuthenticationPrincipal
-        principal: TimelyPrincipal
-    ) = homeDashboardService.getDashboard(principal.companySn)
+        principal: TimelyPrincipal,
+        @Parameter(description = "나에게 배정된 프로젝트 목록 건수. 최대 10건", example = "5")
+        @RequestParam(defaultValue = "5")
+        projectSize: Int,
+        @Parameter(description = "최근 활동 건수. 최대 10건", example = "10")
+        @RequestParam(defaultValue = "10")
+        activitySize: Int
+    ) = homeDashboardService.getDashboard(
+        userSn = principal.userSn,
+        companySn = principal.companySn,
+        projectSize = projectSize,
+        activitySize = activitySize
+    )
 }

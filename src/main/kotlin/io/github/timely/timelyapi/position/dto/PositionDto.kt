@@ -66,10 +66,10 @@ class PositionDto {
         @field:Schema(description = "Use flag", example = "Y")
         val useYn: String,
 
-        @field:Schema(description = "Created date time", example = "2026-05-04T16:00:00")
+        @field:Schema(description = "Created date time (Asia/Seoul)", example = "2026-05-04T16:00:00+09:00")
         val createDt: LocalDateTime?,
 
-        @field:Schema(description = "Updated date time", example = "2026-05-04T16:30:00")
+        @field:Schema(description = "Updated date time (Asia/Seoul)", example = "2026-05-04T16:30:00+09:00")
         val updateDt: LocalDateTime?
     )
 }

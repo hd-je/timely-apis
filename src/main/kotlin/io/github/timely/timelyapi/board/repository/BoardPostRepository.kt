@@ -175,6 +175,73 @@ interface BoardPostRepository : JpaRepository<BoardPost, Long> {
 
     fun countByCompanySnAndAuthorUserSnAndUseYn(companySn: Long, authorUserSn: Long, useYn: String): Long
 
+    @Query(
+        value = """
+            select
+              u.user_sn as userSn,
+              u.user_nm as userName,
+              u.avatar_url as avatarUrl,
+              coalesce(pc.post_count, 0) as postCount,
+              coalesce(cc.comment_count, 0) as commentCount
+            from tb_user u
+            left join (
+              select p.author_user_sn, count(*) as post_count
+              from tb_board_post p
+              where p.company_sn = :companySn
+                and p.use_yn = 'Y'
+              group by p.author_user_sn
+            ) pc on pc.author_user_sn = u.user_sn
+            left join (
+              select c.author_user_sn, count(*) as comment_count
+              from tb_board_comment c
+              join tb_board_post p on p.board_post_sn = c.board_post_sn
+              where p.company_sn = :companySn
+                and p.use_yn = 'Y'
+                and c.use_yn = 'Y'
+              group by c.author_user_sn
+            ) cc on cc.author_user_sn = u.user_sn
+            where u.company_sn = :companySn
+              and u.use_yn = 'Y'
+              and u.user_status = 'ACTIVE'
+              and (coalesce(pc.post_count, 0) > 0 or coalesce(cc.comment_count, 0) > 0)
+            order by coalesce(pc.post_count, 0) desc,
+                     coalesce(cc.comment_count, 0) desc,
+                     u.user_sn asc
+        """,
+        nativeQuery = true
+    )
+    fun findActiveUserActivities(
+        @Param("companySn") companySn: Long,
+        pageable: Pageable
+    ): List<ActiveUserActivityProjection>
+
+    @Query(
+        value = """
+            select
+              (
+                select count(*)
+                from tb_board_post p
+                where p.company_sn = :companySn
+                  and p.author_user_sn = :userSn
+                  and p.use_yn = 'Y'
+              ) as postCount,
+              (
+                select count(*)
+                from tb_board_comment c
+                join tb_board_post p on p.board_post_sn = c.board_post_sn
+                where p.company_sn = :companySn
+                  and p.use_yn = 'Y'
+                  and c.author_user_sn = :userSn
+                  and c.use_yn = 'Y'
+              ) as commentCount
+        """,
+        nativeQuery = true
+    )
+    fun findUserActivity(
+        @Param("userSn") userSn: Long,
+        @Param("companySn") companySn: Long
+    ): UserActivityProjection
+
     fun findByCompanySnAndCategoryAndUseYn(companySn: Long, category: String, useYn: String, pageable: Pageable): Page<BoardPost>
 }
 
@@ -202,4 +269,17 @@ interface BoardPostSummaryProjection {
 
 interface BoardPostDetailProjection : BoardPostSummaryProjection {
     val useYn: String
+}
+
+interface ActiveUserActivityProjection {
+    val userSn: Long
+    val userName: String
+    val avatarUrl: String?
+    val postCount: Long
+    val commentCount: Long
+}
+
+interface UserActivityProjection {
+    val postCount: Long
+    val commentCount: Long
 }

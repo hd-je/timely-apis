@@ -7,6 +7,7 @@ import io.github.timely.timelyapi.board.repository.BoardCommentLikeRepository
 import io.github.timely.timelyapi.board.repository.BoardCommentRepository
 import io.github.timely.timelyapi.common.PageResponse
 import io.github.timely.timelyapi.user.repository.UserRepository
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +17,8 @@ class BoardCommentService(
     private val boardCommentRepository: BoardCommentRepository,
     private val boardCommentLikeRepository: BoardCommentLikeRepository,
     private val boardPostService: BoardPostService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val entityManager: EntityManager
 ) {
 
     @Transactional
@@ -33,14 +35,18 @@ class BoardCommentService(
             require(parentComment.parentCommentSn == null) { "Nested replies are not allowed" }
         }
 
-        return boardCommentRepository.save(
+        val comment = boardCommentRepository.save(
             BoardComment(
                 boardPostSn = boardPostSn,
                 authorUserSn = authorUserSn,
                 parentCommentSn = request.parentCommentSn,
                 content = request.content.trim()
             )
-        ).toResponse(authorUserSn)
+        )
+        entityManager.flush()
+        entityManager.refresh(comment)
+
+        return comment.toResponse(authorUserSn)
     }
 
     @Transactional(readOnly = true)

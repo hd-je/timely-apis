@@ -13,6 +13,8 @@ DB_USER="${DB_USER:-dev}"
 DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD environment variable is required}"
 JWT_SECRET="${JWT_SECRET:?JWT_SECRET environment variable is required}"
 JWT_ACCESS_TOKEN_EXPIRATION_MS="${JWT_ACCESS_TOKEN_EXPIRATION_MS:-3600000}"
+FILE_STORAGE_ROOT="${FILE_STORAGE_ROOT:-/app/uploads}"
+FILE_STORAGE_VOLUME="${FILE_STORAGE_VOLUME:-timely-api-uploads}"
 
 if [ -z "${NETWORK_NAME}" ]; then
   if docker network inspect ci >/dev/null 2>&1; then
@@ -30,6 +32,9 @@ fi
 echo "[deploy] Building ${IMAGE_NAME}"
 docker build -t "${IMAGE_NAME}" .
 
+echo "[deploy] Ensuring persistent upload volume ${FILE_STORAGE_VOLUME}"
+docker volume create "${FILE_STORAGE_VOLUME}" >/dev/null
+
 echo "[deploy] Removing previous ${CONTAINER_NAME} container if it exists"
 docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
 
@@ -45,6 +50,8 @@ docker run -d \
   -e DB_PASSWORD="${DB_PASSWORD}" \
   -e JWT_SECRET="${JWT_SECRET}" \
   -e JWT_ACCESS_TOKEN_EXPIRATION_MS="${JWT_ACCESS_TOKEN_EXPIRATION_MS}" \
+  -e FILE_STORAGE_ROOT="${FILE_STORAGE_ROOT}" \
+  -v "${FILE_STORAGE_VOLUME}:${FILE_STORAGE_ROOT}" \
   "${IMAGE_NAME}"
 
 echo "[deploy] Waiting for application startup"
